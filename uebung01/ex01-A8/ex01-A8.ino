@@ -139,7 +139,7 @@ int mapToFrequency(int trimmerValue) {
     if (trimmerValue < 0) trimmerValue = 0;
     if (trimmerValue > 660) trimmerValue = 660;
 
-    // round to nearest integer
-    double frequency = (50.0 / 660.0) * trimmerValue;
+    // Map to range 1–50, rounding to nearest integer
+    double frequency = (49.0 / 660.0) * trimmerValue + 1.0;
     return static_cast<int>(frequency + 0.5); // Rounds to nearest integer
 }
