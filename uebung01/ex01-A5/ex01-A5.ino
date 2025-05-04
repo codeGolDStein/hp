@@ -21,8 +21,6 @@ String lastButton = "";
 
 void setup() {
   lcd.begin(NUM_CHAR, NUM_LINES);
-  lcd.setCursor(0, 1);  // Start auf zweiter Zeile
-  lcd.print("button: -");
 }
 
 void loop() {
@@ -33,21 +31,20 @@ void loop() {
     currentButton = "S1";
   } else if (a1_value >= 101 && a1_value <= 200) {
     currentButton = "S2";
-  } else if (a1_value >= 201 && a1_value <= 300) {
+  } else if (a1_value >= 300 && a1_value <= 400) {
     currentButton = "S3";
-  } else if (a1_value >= 301 && a1_value <= 400) {
-    currentButton = "S4";
   } else if (a1_value >= 401 && a1_value <= 500) {
+    currentButton = "S4";
+  } else if (a1_value >= 501 && a1_value <= 600) {
     currentButton = "S5";
   } else {
-    currentButton = "-";
+    currentButton = "cock";
   }
 
   // Nur neu anzeigen, wenn sich der Status ändert
   if (currentButton != lastButton) {
-    lcd.setCursor(0, 1);  // Zweite Zeile
+    lcd.setCursor(0, 2);  // Zweite Zeile
     lcd.print("button: " + currentButton + "       ");
-    lastButton = currentButton;
   }
 
   delay(200);
