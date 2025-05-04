@@ -32,7 +32,7 @@ void loop() {
   lcd.setCursor(0, 0);
 
   // Print statements
-  lcd.print("Analog A0: " + String(a0_value));
+  lcd.print("Analog 0: " + String(a0_value));
 
   // Prevent display flickering for too fast updates
   delay(1000);
