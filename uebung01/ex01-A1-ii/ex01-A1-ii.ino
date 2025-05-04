@@ -4,7 +4,7 @@ unsigned long BLINK_TIME_MS_INTERVAL = 1000;
 unsigned long previousMILLIS = 0;
 // set output pin
 #define LED_PIN 10
-
+bool LED_STATUS = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,8 +16,15 @@ void loop() {
 
   if (currentMILLIS - previousMILLIS >= BLINK_TIME_MS_INTERVAL){
     previousMILLIS = currentMILLIS; // Reset
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    //Serial.print(digitalRead(LED_PIN))
+
+    LED_STATUS = !LED_STATUS; // <--- THIS LINE IS ESSENTIAL
+
+    if (LED_STATUS){
+      digitalWrite(LED_PIN, HIGH);// Set LED on
+    } else {
+        digitalWrite(LED_PIN, LOW); //Set LED off
+    }
+
   }
 }
 
