@@ -22,7 +22,7 @@ const int NUM_LEDS = 6;
 LiquidCrystal lcd(R_S, E, DB4, DB5, DB6, DB7);
 
 // Farbnamen
-const String COLORS[] = {"RED", "GREEN", "BLUE"};
+const String COLORS[] = {"GREEN", "YELLOW", "RED"};
 int colorIndex = 0;
 
 // Entprellen
