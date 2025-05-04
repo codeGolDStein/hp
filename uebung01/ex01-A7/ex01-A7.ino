@@ -33,7 +33,7 @@ const unsigned long debounceDelay = 200;
 // Blinken
 unsigned long lastBlinkTime = 0;
 bool ledState = false;
-int blinkDelay = 500;  // wird dynamisch berechnet
+int blinkDelay = 500;
 
 void setup() {
   lcd.begin(NUM_CHAR, NUM_LINES);
@@ -51,7 +51,7 @@ void loop() {
   int frequency = map(trimmerValue, 0, 1023, 1, 50);  // 1–50 Hz
   blinkDelay = 1000 / frequency / 2;  // für Ein/Aus-Phasen
 
-  // --- Taster einlesen mit Entprellung ---
+  // --- Taster einlesen ---
   int a1_value = analogRead(BUTTON_PIN);
   bool buttonPressed = (a1_value >= 0 && a1_value <= 100);
 
