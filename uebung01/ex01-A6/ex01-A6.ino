@@ -11,43 +11,44 @@
 #define NUM_CHAR 20
 #define NUM_LINES 4
 
-#define INPUT_PIN A0
-#define REFERENCE_VOLTAGE 3.3
+#define INPUT_PIN A1
 
+// LCD initialisieren
 LiquidCrystal lcd(R_S, E, DB4, DB5, DB6, DB7);
+
+// Merken, was zuletzt angezeigt wurde
+String lastButton = "";
+
+//print value 
 
 void setup() {
   lcd.begin(NUM_CHAR, NUM_LINES);
-
   Serial.begin(9600); // initialize UART with baud rate of 9600 bps
 }
 
 void loop() {
-  if(Serial.available()){
-    Serial.write()
+  int a1_value = analogRead(INPUT_PIN);
+  String currentButton;
+
+  if (a1_value >= 0 && a1_value <= 100) {
+    currentButton = "S1";
+
+  } else if (a1_value >= 101 && a1_value <= 200) {
+    currentButton = "S2";
+  } else if (a1_value >= 300 && a1_value <= 400) {
+    currentButton = "S3";
+  } else if (a1_value >= 401 && a1_value <= 500) {
+    currentButton = "S4";
+  } else if (a1_value >= 501 && a1_value <= 600) {
+    currentButton = "S5";
+  } else {
+    currentButton = "";
+  }
+  
+  if (currentButton != ""){
+      Serial.println(currentButton);
   }
 
-  int a0_value = analogRead(INPUT_PIN);
 
-  float voltage = (float)(a0_value * REFERENCE_VOLTAGE / 1023.0);
-
-  int volts = (int)voltage;
-  int dezimal = (int)((voltage - volts) * 100);  
-
-
-  if(Serial.available()){
-    Serial.write("Analog 0: <add code here>)
-  }
-
-
-  lcd.setCursor(0, 0);
-  lcd.print("Analog 0: ");
-  lcd.print(volts);
-  lcd.print(".");
-  if (dezimal < 10) lcd.print("0"); 
-  lcd.print(dezimal);
-  lcd.print("V");
-
-  delay(1000);
-  lcd.clear();
+  delay(200);
 }
