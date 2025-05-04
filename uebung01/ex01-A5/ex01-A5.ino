@@ -38,7 +38,7 @@ void loop() {
   } else if (a1_value >= 501 && a1_value <= 600) {
     currentButton = "S5";
   } else {
-    currentButton = "cock";
+    currentButton = "-";
   }
 
   // Nur neu anzeigen, wenn sich der Status ändert
