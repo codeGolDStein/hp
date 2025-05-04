@@ -12,11 +12,11 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMILLIS = milis();
+  unsigned long currentMILLIS = millis();
 
-  if (currentMILLIS - previousMILLIS == BLINK_TIME_MS_INTERVAL){
+  if (currentMILLIS - previousMILLIS >= BLINK_TIME_MS_INTERVAL){
     previousMILLIS = currentMILLIS; // Reset
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN))
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     //Serial.print(digitalRead(LED_PIN))
   }
 }
