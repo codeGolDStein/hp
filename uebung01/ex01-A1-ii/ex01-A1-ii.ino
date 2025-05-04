@@ -4,6 +4,7 @@ unsigned long BLINK_TIME_MS_INTERVAL = 1000;
 unsigned long previousMILLIS = 0;
 // set output pin
 #define LED_PIN 10
+// set LED Status
 bool LED_STATUS = false;
 
 void setup() {
@@ -17,7 +18,7 @@ void loop() {
   if (currentMILLIS - previousMILLIS >= BLINK_TIME_MS_INTERVAL){
     previousMILLIS = currentMILLIS; // Reset
 
-    LED_STATUS = !LED_STATUS; // <--- THIS LINE IS ESSENTIAL
+    LED_STATUS = !LED_STATUS;
 
     if (LED_STATUS){
       digitalWrite(LED_PIN, HIGH);// Set LED on
