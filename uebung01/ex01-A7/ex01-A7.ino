@@ -48,7 +48,7 @@ void setup() {
 void loop() {
   // --- Frequenz einlesen (Trimmer) ---
   int trimmerValue = analogRead(TRIMMER_PIN);
-  int frequency = (50/666) * trimmerValue;
+  int frequency = mapToFrequency(trimmerValue);
   blinkDelay = 1000 / frequency / 2;  // für Ein/Aus-Phasen
 
   // --- Taster einlesen ---
@@ -93,4 +93,14 @@ bool isLedActiveForColor(int ledIndex, int colorIdx) {
   if (colorIdx == 1) return (ledIndex == 2 || ledIndex == 3); // GREEN
   if (colorIdx == 2) return (ledIndex == 4 || ledIndex == 5); // BLUE
   return false;
+}
+
+
+int mapToFrequency(int trimmerValue) {
+    if (trimmerValue < 0) trimmerValue = 0;
+    if (trimmerValue > 660) trimmerValue = 660;
+
+    // round to nearest integer
+    double frequency = (50.0 / 660.0) * trimmerValue;
+    return static_cast<int>(frequency + 0.5); // Rounds to nearest integer
 }
