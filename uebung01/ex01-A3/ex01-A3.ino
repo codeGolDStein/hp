@@ -31,7 +31,7 @@ void loop() {
   lcd.setCursor(0, 0);
   lcd.print("Analog 0: ");
   lcd.print(volts);
-  lcd.print(",");
+  lcd.print(".");
   if (dezimal < 10) lcd.print("0"); 
   lcd.print(dezimal);
   lcd.print("V");
