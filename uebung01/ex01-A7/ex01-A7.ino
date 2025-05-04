@@ -48,7 +48,7 @@ void setup() {
 void loop() {
   // --- Frequenz einlesen (Trimmer) ---
   int trimmerValue = analogRead(TRIMMER_PIN);
-  int frequency = map(trimmerValue, 0, 1023, 1, 50);  // 1–50 Hz
+  int frequency = (50/666) * trimmerValue;
   blinkDelay = 1000 / frequency / 2;  // für Ein/Aus-Phasen
 
   // --- Taster einlesen ---
