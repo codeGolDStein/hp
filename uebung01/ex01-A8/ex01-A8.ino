@@ -32,12 +32,12 @@ const unsigned long debounceDelay = 200;
 // Blinken
 unsigned long lastBlinkTime = 0;
 bool ledState = false;
-int blinkDelay = 500;  // wird dynamisch berechnet
+int blinkDelay = 500;  
 
 // Lauflicht
 bool lauflichtMode = false;
 int lauflichtIndex = 0;
-int lauflichtDirection = 1; // 1 = vorwärts, -1 = rückwärts
+int lauflichtDirection = 1; 
 
 void setup() {
   lcd.begin(NUM_CHAR, NUM_LINES);
@@ -87,7 +87,6 @@ void loop() {
   unsigned long currentMillis = millis();
 
   if (!lauflichtMode) {
-    // --- Blinken wie gehabt ---
     if (currentMillis - lastBlinkTime >= blinkDelay) {
       lastBlinkTime = currentMillis;
       ledState = !ledState;
@@ -116,19 +115,19 @@ void loop() {
   }
 
   // --- LCD Zeile 3 + 4 aktualisieren ---
-  lcd.setCursor(0, 2);  // Zeile 3
+  lcd.setCursor(0, 2);  
   if (!lauflichtMode) {
     lcd.print("Color: " + COLORS[colorIndex] + "       ");
   } else {
     lcd.print("Mode: Lauflicht         ");
   }
-  lcd.setCursor(0, 3);  // Zeile 4
+  lcd.setCursor(0, 3);  
   lcd.print("Freq: " + String(frequency) + " Hz     ");
 }
 
 // Gibt zurück, ob LED[i] für die Farbe aktiv ist
 bool isLedActiveForColor(int ledIndex, int colorIdx) {
-  // Beispiel: 2 LEDs pro Farbe
+
   if (colorIdx == 0) return (ledIndex == 0 || ledIndex == 1); // GREEN
   if (colorIdx == 1) return (ledIndex == 2 || ledIndex == 3); // YELLOW
   if (colorIdx == 2) return (ledIndex == 4 || ledIndex == 5); // RED
@@ -138,8 +137,6 @@ bool isLedActiveForColor(int ledIndex, int colorIdx) {
 int mapToFrequency(int trimmerValue) {
     if (trimmerValue < 0) trimmerValue = 0;
     if (trimmerValue > 660) trimmerValue = 660;
-
-    // Map to range 1–50, rounding to nearest integer
     double frequency = (49.0 / 660.0) * trimmerValue + 1.0;
-    return static_cast<int>(frequency + 0.5); // Rounds to nearest integer
+    return static_cast<int>(frequency + 0.5); 
 }

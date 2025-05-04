@@ -43,7 +43,7 @@ void loop() {
 
   // Nur neu anzeigen, wenn sich der Status ändert
   if (currentButton != lastButton) {
-    lcd.setCursor(0, 2);  // Zweite Zeile
+    lcd.setCursor(0, 2);  
     lcd.print("button: " + currentButton + "       ");
   }
 

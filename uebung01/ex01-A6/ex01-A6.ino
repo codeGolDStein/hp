@@ -17,9 +17,7 @@
 LiquidCrystal lcd(R_S, E, DB4, DB5, DB6, DB7);
 
 // Merken, was zuletzt angezeigt wurde
-String lastButton = "";
-
-//print value 
+String lastButton = ""; 
 
 void setup() {
   lcd.begin(NUM_CHAR, NUM_LINES);
