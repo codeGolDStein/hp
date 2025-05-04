@@ -11,7 +11,9 @@
 #define NUM_CHAR 20
 #define NUM_LINES 4
 
-#define INPUT_PIN A0
+#define INPUT_PIN0 A0
+#define INPUT_PIN1 A1
+
 #define REFERENCE_VOLTAGE 3.3
 
 LiquidCrystal lcd(R_S, E, DB4, DB5, DB6, DB7);
@@ -21,7 +23,8 @@ void setup() {
 }
 
 void loop() {
-  int a0_value = analogRead(INPUT_PIN);
+  int a0_value = analogRead(INPUT_PIN0);
+  int a1_value = analogRead(INPUT_PIN1);
 
   float voltage = (float)(a0_value * REFERENCE_VOLTAGE / 1023.0);
 
@@ -32,9 +35,16 @@ void loop() {
   lcd.print("Analog 0: ");
   lcd.print(volts);
   lcd.print(".");
-  if (dezimal < 10) lcd.print("0"); 
+  if (dezimal < 10) lcd.print("0");
   lcd.print(dezimal);
   lcd.print("V");
+
+  lcd.setCursor(0, 1);
+  if (a1_valaue == 436){
+    lcd.print("Analog 1: s1 ");
+    lcd.print(a1_value);
+  }
+
 
   delay(1000);
   lcd.clear();
