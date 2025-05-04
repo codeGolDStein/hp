@@ -11,62 +11,86 @@
 #define NUM_CHAR 20
 #define NUM_LINES 4
 
-#define INPUT_PIN A0
-#define INPUT_PIN A1
+#define BUTTON_PIN A1       // Taster S1 wird darüber gelesen
+#define TRIMMER_PIN A0      // Trimmer Tr1 für Frequenz
 
-// LED PINS
-#define LED_PIN 5
+// LED Pins (LED1 bis LED6 an Pins 2–7)
+const int LED_PINS[] = {2, 3, 4, 5, 6, 7};
+const int NUM_LEDS = 6;
 
 // LCD initialisieren
 LiquidCrystal lcd(R_S, E, DB4, DB5, DB6, DB7);
 
-// Merken, was zuletzt angezeigt wurde
-String lastButton = "";
+// Farbnamen
+const String COLORS[] = {"RED", "GREEN", "BLUE"};
+int colorIndex = 0;
 
-unsigned long BLINK_TIME_MS_INTERVAL = 1000;
-// set LED Status
-bool LED_STATUS = false;
-unsigned long previousMILLIS = 0;
+// Entprellen
+bool lastButtonState = false;
+unsigned long lastDebounceTime = 0;
+const unsigned long debounceDelay = 200;
 
-
-//--------------------------------
-// Tr1 Frequenz
-//unsigned long tr1_value = 0
-
+// Blinken
+unsigned long lastBlinkTime = 0;
+bool ledState = false;
+int blinkDelay = 500;  // wird dynamisch berechnet
 
 void setup() {
   lcd.begin(NUM_CHAR, NUM_LINES);
-  lcd.setCursor(0, 1);  // Start auf zweiter Zeile
-  lcd.print("button: -");
 
-  
+  // LEDs als Ausgang
+  for (int i = 0; i < NUM_LEDS; i++) {
+    pinMode(LED_PINS[i], OUTPUT);
+    digitalWrite(LED_PINS[i], LOW);
+  }
 }
 
 void loop() {
-  unsigned long currentMILLIS = millis();
+  // --- Frequenz einlesen (Trimmer) ---
+  int trimmerValue = analogRead(TRIMMER_PIN);
+  int frequency = map(trimmerValue, 0, 1023, 1, 50);  // 1–50 Hz
+  blinkDelay = 1000 / frequency / 2;  // für Ein/Aus-Phasen
 
+  // --- Taster einlesen mit Entprellung ---
+  int a1_value = analogRead(BUTTON_PIN);
+  bool buttonPressed = (a1_value >= 0 && a1_value <= 100);
 
-  // read value of Trimmer
-  int a0_value = analogRead(INPUT_PIN);
-  // read value of Button
-  int a1_value = analogRead(INPUT_PIN);
-  
-  // chnage Blink time interval
-  BLINK_TIME_MS_INTERVAL = (BLINK_TIME_MS_INTERVAL / a0_value);
-
-
-  // Turn light on and off
-  //--------------------------------
-  if (currentMILLIS - previousMILLIS >= BLINK_TIME_MS_INTERVAL){
-    previousMILLIS = currentMILLIS; // Reset
-
-    LED_STATUS = !LED_STATUS;
-
-    if (LED_STATUS){
-      digitalWrite(LED_PIN, HIGH);// Set LED on
-    } else {
-        digitalWrite(LED_PIN, LOW); //Set LED off
-    }
-
+  if (buttonPressed && !lastButtonState && (millis() - lastDebounceTime > debounceDelay)) {
+    // Farbwechsel
+    colorIndex = (colorIndex + 1) % 3;
+    lastDebounceTime = millis();
   }
-}  
+  lastButtonState = buttonPressed;
+
+  // --- LEDs je nach Farbe steuern ---
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastBlinkTime >= blinkDelay) {
+    lastBlinkTime = currentMillis;
+    ledState = !ledState;
+
+    // LED-Muster je nach Farbe
+    for (int i = 0; i < NUM_LEDS; i++) {
+      if (ledState && isLedActiveForColor(i, colorIndex)) {
+        digitalWrite(LED_PINS[i], HIGH);
+      } else {
+        digitalWrite(LED_PINS[i], LOW);
+      }
+    }
+  }
+
+  // --- LCD Zeile 3 + 4 aktualisieren ---
+  lcd.setCursor(0, 2);  // Zeile 3
+  lcd.print("Color: " + COLORS[colorIndex] + "       ");
+
+  lcd.setCursor(0, 3);  // Zeile 4
+  lcd.print("Freq: " + String(frequency) + " Hz     ");
+}
+
+// Gibt zurück, ob LED[i] für die Farbe aktiv ist
+bool isLedActiveForColor(int ledIndex, int colorIdx) {
+  // Beispiel: 2 LEDs pro Farbe
+  if (colorIdx == 0) return (ledIndex == 0 || ledIndex == 1); // RED
+  if (colorIdx == 1) return (ledIndex == 2 || ledIndex == 3); // GREEN
+  if (colorIdx == 2) return (ledIndex == 4 || ledIndex == 5); // BLUE
+  return false;
+}
