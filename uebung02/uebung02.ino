@@ -15,15 +15,16 @@ void setup() {
 }
 
 void loop() {
-    // Drive forward for 2 seconds at medium speed
-  drive(true, 2000, 600);
-
-  delay(1000);
-
   // Drive backward for 1.5 seconds at full speed
-  drive(false, 1500, 600);
+  drive(false, 1500, 4000);
 
   delay(1000);
+
+  turn(true, 2000, 400);
+
+  delay(2000);
+
+  turn(false, 2000, 400);
 
   // Rückwärts für 2 Sekunden
   //setMotor(false, 300);
@@ -37,7 +38,7 @@ void setMotor(bool forward, uint16_t speed, bool motor) {
   int8_t Motor2 = A2_PIN;
   uint16_t speedReverse = 0;
 
-
+  // Aufgabe 2
   if (!motor){
     Motor1 = B1_PIN;
     Motor2 = B2_PIN;
@@ -54,10 +55,24 @@ void setMotor(bool forward, uint16_t speed, bool motor) {
   }
 }
 
+// Aufgabe 3
 // Drive both motors forward/backward for a duration (ms) with given speed
 void drive(bool forward, uint32_t duration, uint16_t speed) {
   setMotor(forward, speed, true);   // Motor A
   setMotor(forward, speed, false);  // Motor B
+
+  delay(duration);
+
+  // Stop both motors
+  setMotor(true, 0, true);
+  setMotor(true, 0, false);
+}
+
+
+// turn, if left = true -> 
+void turn(bool left, uint32_t duration, uint16_t speed) {
+  setMotor(left, speed, true);   // Motor A
+  setMotor(!left, speed, false);  // Motor B
 
   delay(duration);
 
