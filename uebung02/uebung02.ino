@@ -16,7 +16,7 @@ void setup() {
 
 void loop() {
   // Beispiel: Vorwärts für 2 Sekunden
-  setMotor(true, 300, true);
+  setMotor(true, 300, false);
   delay(2000);
 
   // Rückwärts für 2 Sekunden
@@ -24,22 +24,26 @@ void loop() {
   //delay(2000);
 }
 
-// Neue Funktion mit Geschwindigkeitskontrolle (motor = true -> right Wheel)
+// Neue Funktion mit Geschwindigkeitskontrolle (motor = true -> left Wheel)
 void setMotor(bool forward, uint16_t speed, bool motor) {
   
-  int8_t Motor1 = B1_PIN;
-  int8_t Motor2 = B2_PIN;
+  int8_t Motor1 = A1_PIN;
+  int8_t Motor2 = A2_PIN;
+  uint16_t speedReverse = 0;
+
 
   if (!motor){
-    Motor1 = A1_PIN;
-    Motor2 = A2_PIN;
+    Motor1 = B1_PIN;
+    Motor2 = B2_PIN;
+    speedReverse = speed;
+    speed = 0;
   }
 
   if (forward) {
-    analogWrite(Motor1, 0);
+    analogWrite(Motor1, speedReverse);
     analogWrite(Motor2, speed);
   } else {
     analogWrite(Motor1, speed);
-    analogWrite(Motor2, 0);
+    analogWrite(Motor2, speedReverse);
   }
 }
