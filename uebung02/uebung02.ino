@@ -9,6 +9,11 @@ const int8_t S1_PIN = D4;
 const int8_t S2_PIN = D7;
 const int8_t S3_PIN = D3;
 
+enum Sensoren {
+  Sen1,
+  Sen2,
+  Sen3,
+};
 
 
 void setup() {
@@ -42,41 +47,28 @@ void loop() {
   //delay(2000);
 }
 
-int8_t measureDistance(char sensor){
+int8_t measureDistance(Sensoren sensoren){
   
   int distance;
+  int8_t selectedPIN;
 
-  if(sensor == "s1"){
-
-    pinMode(S1_PIN, OUTPUT);
-    digitalWrite(S1_PIN, LOW);
-    delay(2):
-    digitalWrite(S1_PIN, HIGH);
-    delay(10);
-    digitalWrite(S1_PIN, LOW);
-    distance = pulseIn(S1_PIN, HIGH);
-
-  } else if (sensor == "s2") {
-
-    pinMode(S2_PIN, OUTPUT);
-    digitalWrite(S2_PIN, LOW);
-    delay(2);
-    digitalWrite(S2_PIN, HIGH);
-    delay(10);
-    digitalWrite(S2_PIN, LOW);
-    distance = pulseIn(S2_PIN, HIGH);
-
-  } else if (sensor == "s3") {
-
-    pinMode(S2_PIN, OUTPUT);
-    digitalWrite(S2_PIN, LOW);
-    delay(2);
-    digitalWrite(S2_PIN, HIGH);
-    delay(10);
-    digitalWrite(S2_PIN, LOW);
-    distance = pulseIn(S2_PIN, HIGH);
-
+  switch(sensoren) {
+    case S1:
+      selectedPIN = S1_PIN;
+    case S2:
+      selectedPIN = S2_PIN;
+    case S3:
+      selectedPIN = S3_PIN;
   }
+
+  pinMode(selectedPIN, OUTPUT);
+  digitalWrite(selectedPIN, LOW);
+  delay(2):
+  digitalWrite(selectedPIN, HIGH);
+  delay(10);
+  digitalWrite(selectedPIN, LOW);
+  distance = pulseIn(selectedPIN, HIGH);
+
 
   return distance;
 }
