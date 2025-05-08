@@ -22,29 +22,20 @@ void setup() {
   pinMode(A2_PIN, OUTPUT);
   pinMode(B1_PIN, OUTPUT);
   pinMode(B2_PIN, OUTPUT);
-
-  // Sensor Pins als Ausgang definieren
-  pinMode(S1_PIN, OUTPUT);
-  pinMode(S2_PIN, OUTPUT);
-  pinMode(S3_PIN, OUTPUT);
   
+  Serial.begin(9600);
 }
 
 void loop() {
   // Drive backward for 1.5 seconds at full speed
-  drive(false, 1500, 4000);
-
-  delay(1000);
-
-  turn(true, 2000, 400);
-
-  delay(2000);
-
-  turn(false, 2000, 400);
-
-  // Rückwärts für 2 Sekunden
-  //setMotor(false, 300);
-  //delay(2000);
+  // drive(false, 1500, 4000);
+  // delay(1000);
+  // turn(true, 2000, 400);
+  // delay(2000);
+  // turn(false, 2000, 400);
+  Serial.println("val S1:" + measureDistance(Sen1));
+  Serial.println("val S2:" + measureDistance(Sen2));
+  Serial.println("val S3:" + measureDistance(Sen3));
 }
 
 int8_t measureDistance(Sensoren sensoren){
@@ -53,17 +44,17 @@ int8_t measureDistance(Sensoren sensoren){
   int8_t selectedPIN;
 
   switch(sensoren) {
-    case S1:
+    case Sen1:
       selectedPIN = S1_PIN;
-    case S2:
+    case Sen2:
       selectedPIN = S2_PIN;
-    case S3:
+    case Sen3:
       selectedPIN = S3_PIN;
   }
 
   pinMode(selectedPIN, OUTPUT);
   digitalWrite(selectedPIN, LOW);
-  delay(2):
+  delay(2);
   digitalWrite(selectedPIN, HIGH);
   delay(10);
   digitalWrite(selectedPIN, LOW);
