@@ -14,7 +14,7 @@ void setup() {
 
 void loop() {
   // Beispiel: Vorwärts für 2 Sekunden
-  setMotor(true, 300);
+  setMotor(true, 100);
   delay(2000);
 
   // Rückwärts für 2 Sekunden
@@ -24,8 +24,6 @@ void loop() {
 
 // Neue Funktion mit Geschwindigkeitskontrolle
 void setMotor(bool forward, uint16_t speed) {
-  // Begrenze den Wert auf gültigen Bereich
-  speed = constrain(speed, 0, 1023);
 
   if (forward) {
     analogWrite(A1, 0);         // LOW
