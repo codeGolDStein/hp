@@ -12,11 +12,16 @@ const int8_t S3_PIN = D3;
 
 
 void setup() {
-  // Pins als Ausgang definieren
+  // Motor Pins als Ausgang definieren
   pinMode(A1_PIN, OUTPUT);
   pinMode(A2_PIN, OUTPUT);
   pinMode(B1_PIN, OUTPUT);
   pinMode(B2_PIN, OUTPUT);
+
+  // Sensor Pins als Ausgang definieren
+  pinMode(S1_PIN, OUTPUT);
+  pinMode(S2_PIN, OUTPUT);
+  pinMode(S3_PIN, OUTPUT);
   
 }
 
@@ -35,6 +40,45 @@ void loop() {
   // Rückwärts für 2 Sekunden
   //setMotor(false, 300);
   //delay(2000);
+}
+
+int8_t measureDistance(char sensor){
+  
+  int distance;
+
+  if(sensor == "s1"){
+
+    pinMode(S1_PIN, OUTPUT);
+    digitalWrite(S1_PIN, LOW);
+    delay(2):
+    digitalWrite(S1_PIN, HIGH);
+    delay(10);
+    digitalWrite(S1_PIN, LOW);
+    distance = pulseIn(S1_PIN, HIGH);
+
+  } else if (sensor == "s2") {
+
+    pinMode(S2_PIN, OUTPUT);
+    digitalWrite(S2_PIN, LOW);
+    delay(2);
+    digitalWrite(S2_PIN, HIGH);
+    delay(10);
+    digitalWrite(S2_PIN, LOW);
+    distance = pulseIn(S2_PIN, HIGH);
+
+  } else if (sensor == "s3") {
+
+    pinMode(S2_PIN, OUTPUT);
+    digitalWrite(S2_PIN, LOW);
+    delay(2);
+    digitalWrite(S2_PIN, HIGH);
+    delay(10);
+    digitalWrite(S2_PIN, LOW);
+    distance = pulseIn(S2_PIN, HIGH);
+
+  }
+
+  return distance;
 }
 
 // Neue Funktion mit Geschwindigkeitskontrolle (motor = true -> left Wheel)
