@@ -1,8 +1,14 @@
-// Pinbelegung
+// Pinbelegung Motoren
 const int8_t A1_PIN = D1;  // GPIO5
 const int8_t A2_PIN = D2;  // GPIO4
 const int8_t B1_PIN = D5;
 const int8_t B2_PIN = D6;
+
+// Pinbelegung Sensoren
+const int8_t S1_PIN = D4; 
+const int8_t S2_PIN = D7;
+const int8_t S3_PIN = D3;
+
 
 
 void setup() {
