@@ -14,21 +14,24 @@ void setup() {
 
 void loop() {
   // Beispiel: Vorwärts für 2 Sekunden
-  setMotor(true);
+  setMotor(true, 300);
   delay(2000);
 
   // Rückwärts für 2 Sekunden
-  //setMotor(false);
-  delay(2000);
+  //setMotor(false, 300);
+  //delay(2000);
 }
 
-//Aufgabe 1, Funktion zum Steuern des Motors
-void setMotor(bool forward) {
+// Neue Funktion mit Geschwindigkeitskontrolle
+void setMotor(bool forward, uint16_t speed) {
+  // Begrenze den Wert auf gültigen Bereich
+  speed = constrain(speed, 0, 1023);
+
   if (forward) {
-    digitalWrite(A1, LOW);   // A1 = 0
-    digitalWrite(A2, HIGH);  // A2 = 1
+    analogWrite(A1, 0);         // LOW
+    analogWrite(A2, speed);     // PWM Signal
   } else {
-    digitalWrite(A1, HIGH);  // A1 = 1
-    digitalWrite(A2, LOW);   // A2 = 0
+    analogWrite(A1, speed);     // PWM Signal
+    analogWrite(A2, 0);         // LOW
   }
 }
