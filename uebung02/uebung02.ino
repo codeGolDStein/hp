@@ -19,6 +19,16 @@ void loop() {
   setMotor(true, 300, false);
   delay(2000);
 
+    // Drive forward for 2 seconds at medium speed
+  drive(true, 2000, 600);
+
+  delay(1000);
+
+  // Drive backward for 1.5 seconds at full speed
+  drive(false, 1500, 1023);
+
+  delay(1000);
+
   // Rückwärts für 2 Sekunden
   //setMotor(false, 300);
   //delay(2000);
@@ -46,4 +56,16 @@ void setMotor(bool forward, uint16_t speed, bool motor) {
     analogWrite(Motor1, speed);
     analogWrite(Motor2, speedReverse);
   }
+}
+
+// Drive both motors forward/backward for a duration (ms) with given speed
+void drive(bool forward, uint32_t duration, uint16_t speed) {
+  setMotor(forward, speed, true);   // Motor A
+  //setMotor(forward, speed, false);  // Motor B
+
+  delay(duration);
+
+  // Stop both motors
+  setMotor(true, 0, true);
+  setMotor(true, 0, false);
 }
