@@ -33,19 +33,19 @@ void loop() {
   delay(1000);
 
   // Drive backward for 1.5 seconds at full speed
-  //drive(false, 1500, 4000);
+  drive(false, 1500, 4000);
 
-  //delay(1000);
+  delay(1000);
 
-  //turn(true, 2000, 400);
+  turn(true, 2000, 400);
 
-  //delay(2000);
+  delay(2000);
 
-  //turn(false, 2000, 400);
+  turn(false, 2000, 400);
 
   // Rückwärts für 2 Sekunden
-  //setMotor(false, 300);
-  //delay(2000);
+  // setMotor(false, 300);
+  delay(2000);
 }
 
 // Aufgabe 5: Misst die Entfernung in Metern (oder -1, wenn kein Hindernis erkannt)

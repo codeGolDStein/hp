@@ -92,8 +92,8 @@ void handleClient() {
   request = client.readStringUntil('\r');
 
   // Print request to serial
-  // Serial.print("request: ");
-  // Serial.println(request); 
+  Serial.print("request: ");
+  Serial.println(request); 
 
   // print header message
   client.println(header);
@@ -109,7 +109,10 @@ void handleClient() {
     
   // Insert code to make the d-pad control working
   // Start by pressing the buttons of the d pad and watch the serial console to see how the get requests look.
+   
+  } else if (request.indexOf("GET /up") >= 0) {
 
+    drive(true, 500, 4000);
   
   // Serve initial Website
   } else {
@@ -151,22 +154,24 @@ float measureDistance(uint8_t pin) {
   return distance;
 }
 
+
 void turn(bool left, uint16_t time, uint16_t speed) {
   setMotor(left, speed, true);   // Motor A
   setMotor(!left, speed, false);  // Motor B
 
-  delay(duration);
+  delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
 }
+
 
 void drive(bool forward, uint16_t time, uint16_t speed) {
   setMotor(forward, speed, true);   // Motor A
   setMotor(forward, speed, false);  // Motor B
 
-  delay(duration);
+  delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
@@ -174,13 +179,13 @@ void drive(bool forward, uint16_t time, uint16_t speed) {
 }
 
 
-void setMotor(bool forward, bool motorA, uint16_t speed) {
+void setMotor(bool forward, uint16_t speed, bool motorA) {
   int8_t Motor1 = MOTOR_A1_PIN;
   int8_t Motor2 = MOTOR_A2_PIN;
   uint16_t speedReverse = 0;
 
   // Aufgabe 2
-  if (!motor){
+  if (!motorA){
     Motor1 = MOTOR_B1_PIN;
     Motor2 = MOTOR_B2_PIN;
     speedReverse = speed;
