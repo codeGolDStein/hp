@@ -29,6 +29,7 @@ const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_
 #define US3_PIN D3
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
+bool teslaMode = false;
 
 void setup() {
   // Init serial
@@ -71,6 +72,8 @@ void setup() {
     Serial.println("Error starting MDNS");
   }
 
+
+
   // Start webserver
   server.begin();
 }
@@ -80,6 +83,17 @@ void loop() {
   handleClient();
   // Update MDNS
   MDNS.update();
+  if (teslaMode) {
+    float distance = measureDistance(US1_PIN);  // z. B. D7, ersetze mit deinem Pin
+
+    if (distance > 0 && distance < 0.25) {  // Wenn Hindernis < 25 cm
+      turn(false, 400, 200);  // Rechts drehen
+    } else {
+      drive(true, 200, 180);  // Vorwärts fahren
+    }
+  } else {
+    drive(true, 200, 0);  // "Stopp" durch Fahrt mit Speed 0
+  }
 }
 
 void handleClient() {
@@ -127,7 +141,14 @@ void handleClient() {
   else if (request.indexOf("GET /right") >= 0) {
 
     turn(true, 300, 512);
-  
+  }
+
+  else if (request.indexOf("GET /tesla") >= 0) {
+  teslaMode = !teslaMode;
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/plain");
+  client.println();
+  client.println(teslaMode ? "Tesla ON" : "Tesla OFF");
 
   // Serve initial Website
   } else {
