@@ -92,14 +92,14 @@ void handleClient() {
   request = client.readStringUntil('\r');
 
   // Print request to serial
-  Serial.print("request: ");
-  Serial.println(request); 
+  // Serial.print("request: ");
+  // Serial.println(request); 
 
   // print header message
   client.println(header);
   // Check for corresponding get message  
   if (request.indexOf("GET /pollUS") >= 0) {
-    Serial.println("Polling");
+    // Serial.println("Polling");
     float us1 = measureDistance(US1_PIN);
     float us2 = measureDistance(US2_PIN);
     float us3 = measureDistance(US3_PIN);
@@ -122,25 +122,32 @@ void handleClient() {
 
 
 float measureDistance(uint8_t pin) {
-  // Schritt 1: Trigger-Puls senden
+  long duration;
+  float distance;
+
+  // Trigger-Puls senden
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
-  delayMicroseconds(2);
+  delayMicroseconds(5);
   digitalWrite(pin, HIGH);
   delayMicroseconds(10);
   digitalWrite(pin, LOW);
 
-  // Schritt 2: Pin als Eingang setzen und Echo-Zeit messen
+  // Pin auf Input stellen, um Echo zu empfangen
   pinMode(pin, INPUT);
-  long duration = pulseIn(pin, HIGH, 30000);  // Timeout: 30 ms
+  duration = pulseIn(pin, HIGH, 30000);  // Timeout nach 30 ms
 
-  // Schritt 3: Kein Signal erhalten?
   if (duration == 0) {
     return -1.0;  // Kein Hindernis erkannt
   }
 
-  // Schritt 4: Entfernung berechnen (Meter)
-  float distance = (duration * 0.0343) / 2.0;
+  // Umrechnung von Mikrosekunden in Meter
+  distance = duration * 0.0001715; // (343 m/s / 2 / 1.000.000)
+
+  // if(pin == 0){
+  //   Serial.println(String(pin) + " Duration: " +  String(duration));
+  // }
+
   return distance;
 }
 
