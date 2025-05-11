@@ -4,8 +4,8 @@
 #include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "Omar's iPhone";
-const char* password = "19551967zZ@";
+const char* ssid     = "iPhone Alex";
+const char* password = "spast2002";
 
 // Webserver on port 80 (standard http port)
 WiFiServer server(80);
@@ -32,7 +32,7 @@ const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 void setup() {
   // Init serial
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // Init motor pins as output
   for (size_t i = 0; i < sizeof(motorPins)/sizeof(motorPins[0]); i++) {
@@ -100,9 +100,9 @@ void handleClient() {
   // Check for corresponding get message  
   if (request.indexOf("GET /pollUS") >= 0) {
     Serial.println("Polling");
-    float us1, us2, us3 = -1;
-    // Insert your code here
-
+    float us1 = measureDistance(US1_PIN);
+    float us2 = measureDistance(US2_PIN);
+    float us3 = measureDistance(US3_PIN);
 
     // Send US data to website
     client.printf("{\"US1\":%.2f, \"US2\":%.2f, \"US3\":%.2f}", us1, us2, us3);
@@ -122,8 +122,26 @@ void handleClient() {
 
 
 float measureDistance(uint8_t pin) {
-  // To implement
-  return -1;  
+  // Schritt 1: Trigger-Puls senden
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pin, LOW);
+
+  // Schritt 2: Pin als Eingang setzen und Echo-Zeit messen
+  pinMode(pin, INPUT);
+  long duration = pulseIn(pin, HIGH, 30000);  // Timeout: 30 ms
+
+  // Schritt 3: Kein Signal erhalten?
+  if (duration == 0) {
+    return -1.0;  // Kein Hindernis erkannt
+  }
+
+  // Schritt 4: Entfernung berechnen (Meter)
+  float distance = (duration * 0.0343) / 2.0;
+  return distance;
 }
 
 void turn(bool left, uint16_t time, uint16_t speed) {

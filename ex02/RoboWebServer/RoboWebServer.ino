@@ -4,8 +4,8 @@
 #include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "SecretAP";
-const char* password = "MySuperSecretPassword";
+const char* ssid     = "iPhone Alex";
+const char* password = "spast2002";
 
 // Webserver on port 80 (standard http port)
 WiFiServer server(80);
@@ -32,7 +32,7 @@ const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 void setup() {
   // Init serial
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // Init motor pins as output
   for (size_t i = 0; i < sizeof(motorPins)/sizeof(motorPins[0]); i++) {
