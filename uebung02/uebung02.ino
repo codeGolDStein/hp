@@ -9,6 +9,10 @@ const int8_t S1_PIN = D4;
 const int8_t S2_PIN = D7;
 const int8_t S3_PIN = D3;
 
+// 5cm = 447 duration 
+// 10cm = 633 duration
+// 15 cm = 947 duration
+// 20 = 1233 duration
 
 
 void setup() {
@@ -23,62 +27,54 @@ void setup() {
   pinMode(S2_PIN, OUTPUT);
   pinMode(S3_PIN, OUTPUT);
   
+  Serial.begin(9600);
 }
 
 void loop() {
-  // Drive backward for 1.5 seconds at full speed
-  drive(false, 1500, 4000);
 
+  float dist = measureDistance(S2_PIN);
+  Serial.print("Distance (m): ");
+  Serial.println(dist);
   delay(1000);
 
-  turn(true, 2000, 400);
+  // Drive backward for 1.5 seconds at full speed
+  //drive(false, 1500, 4000);
 
-  delay(2000);
+  //delay(1000);
 
-  turn(false, 2000, 400);
+  //turn(true, 2000, 400);
+
+  //delay(2000);
+
+  //turn(false, 2000, 400);
 
   // Rückwärts für 2 Sekunden
   //setMotor(false, 300);
   //delay(2000);
 }
 
-int8_t measureDistance(char sensor){
-  
-  int distance;
+// Aufgabe 5: Misst die Entfernung in Metern (oder -1, wenn kein Hindernis erkannt)
+float measureDistance(int pin) {
+  // Schritt 1: Trigger-Puls senden
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(pin, LOW);
 
-  if(sensor == "s1"){
+  // Schritt 2: Pin als Eingang setzen und Echo-Zeit messen
+  pinMode(pin, INPUT);
+  long duration = pulseIn(pin, HIGH, 30000);  // Timeout: 30 ms
 
-    pinMode(S1_PIN, OUTPUT);
-    digitalWrite(S1_PIN, LOW);
-    delay(2):
-    digitalWrite(S1_PIN, HIGH);
-    delay(10);
-    digitalWrite(S1_PIN, LOW);
-    distance = pulseIn(S1_PIN, HIGH);
-
-  } else if (sensor == "s2") {
-
-    pinMode(S2_PIN, OUTPUT);
-    digitalWrite(S2_PIN, LOW);
-    delay(2);
-    digitalWrite(S2_PIN, HIGH);
-    delay(10);
-    digitalWrite(S2_PIN, LOW);
-    distance = pulseIn(S2_PIN, HIGH);
-
-  } else if (sensor == "s3") {
-
-    pinMode(S2_PIN, OUTPUT);
-    digitalWrite(S2_PIN, LOW);
-    delay(2);
-    digitalWrite(S2_PIN, HIGH);
-    delay(10);
-    digitalWrite(S2_PIN, LOW);
-    distance = pulseIn(S2_PIN, HIGH);
-
+  // Schritt 3: Kein Signal erhalten?
+  if (duration == 0) {
+    return -1.0;  // Kein Hindernis erkannt
   }
 
-  return distance;
+  // Schritt 4: Entfernung berechnen (Meter)
+  //float distance = (duration * 0.0343) / 2.0;
+  return duration;
 }
 
 // Neue Funktion mit Geschwindigkeitskontrolle (motor = true -> left Wheel)
