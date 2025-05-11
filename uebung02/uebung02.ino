@@ -21,11 +21,6 @@ void setup() {
   pinMode(A2_PIN, OUTPUT);
   pinMode(B1_PIN, OUTPUT);
   pinMode(B2_PIN, OUTPUT);
-
-  // Sensor Pins als Ausgang definieren
-  pinMode(S1_PIN, OUTPUT);
-  pinMode(S2_PIN, OUTPUT);
-  pinMode(S3_PIN, OUTPUT);
   
   Serial.begin(9600);
 }
