@@ -110,10 +110,25 @@ void handleClient() {
   // Insert code to make the d-pad control working
   // Start by pressing the buttons of the d pad and watch the serial console to see how the get requests look.
    
-  } else if (request.indexOf("GET /up") >= 0) {
-
-    drive(true, 500, 4000);
+  } 
   
+  else if (request.indexOf("GET /up") >= 0) {
+
+    drive(true, 300, 512);
+  }
+  else if (request.indexOf("GET /back") >= 0) {
+
+    drive(false, 300, 512);
+  }
+  else if (request.indexOf("GET /left") >= 0) {
+
+    turn(false, 300, 512);
+  }
+  else if (request.indexOf("GET /right") >= 0) {
+
+    turn(true, 300, 512);
+  
+
   // Serve initial Website
   } else {
     // Finish HTTP-Request with a newline (thats cruical)
