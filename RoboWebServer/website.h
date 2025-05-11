@@ -187,7 +187,6 @@ const char page[] = R"=====(
         </div>
     </div>
 
-    /// Aufgabe 7
     <div class="container" style="margin-top: 30px;">
     <button id="tesla" onclick="gamepad(this)" style="font-size: x-large; padding: 1em; border-radius: 10px;">
         Tesla Mode
