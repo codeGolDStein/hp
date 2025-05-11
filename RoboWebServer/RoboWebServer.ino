@@ -152,13 +152,46 @@ float measureDistance(uint8_t pin) {
 }
 
 void turn(bool left, uint16_t time, uint16_t speed) {
-  // To implement
+  setMotor(left, speed, true);   // Motor A
+  setMotor(!left, speed, false);  // Motor B
+
+  delay(duration);
+
+  // Stop both motors
+  setMotor(true, 0, true);
+  setMotor(true, 0, false);
 }
 
 void drive(bool forward, uint16_t time, uint16_t speed) {
-  // To implement
+  setMotor(forward, speed, true);   // Motor A
+  setMotor(forward, speed, false);  // Motor B
+
+  delay(duration);
+
+  // Stop both motors
+  setMotor(true, 0, true);
+  setMotor(true, 0, false);
 }
 
+
 void setMotor(bool forward, bool motorA, uint16_t speed) {
-  // To implement
+  int8_t Motor1 = MOTOR_A1_PIN;
+  int8_t Motor2 = MOTOR_A2_PIN;
+  uint16_t speedReverse = 0;
+
+  // Aufgabe 2
+  if (!motor){
+    Motor1 = MOTOR_B1_PIN;
+    Motor2 = MOTOR_B2_PIN;
+    speedReverse = speed;
+    speed = 0;
+  }
+
+  if (forward) {
+    analogWrite(Motor1, speedReverse);
+    analogWrite(Motor2, speed);
+  } else {
+    analogWrite(Motor1, speed);
+    analogWrite(Motor2, speedReverse);
+  }
 }
