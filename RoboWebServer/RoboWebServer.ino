@@ -1,20 +1,25 @@
 // Include WiFi libs
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include "website.h"
+#inc
+lude "website.h"
 
 // Add your wifi credentials here
 const char* ssid     = "KadensKerker";
 const char* password = "DippShitMidgetsshittinh88!";
 
+
 // Webserver on port 80 (standard http port)
 WiFiServer server(80);
+
 
 // Variable to store incoiming http request
 String request;
 
+
 // Name of the device (can be used as DNS query in browser)
 #define DEVICE_NAME "HWPRobo"
+
 
 // Pins of motor
 #define MOTOR_A1_PIN D1
@@ -23,13 +28,16 @@ String request;
 #define MOTOR_B2_PIN D6
 const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_PIN};
 
+
 // Us pins
 #define US1_PIN D8
 #define US2_PIN D7
 #define US3_PIN D3
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
+
 bool teslaMode = false;
+
 
 void setup() {
   // Init serial
@@ -73,11 +81,10 @@ void setup() {
     Serial.println("Error starting MDNS");
   }
 
-
-
   // Start webserver
   server.begin();
 }
+
 
 void loop() {
   // Handle clients
@@ -97,14 +104,15 @@ if (teslaMode) {
 
       turn(false, 400, 80);     // Turn right
       delay(300);
-      drive(true, 200, 80);    // Move forward
+      drive(true, 200, 80);     // Move forward
     } else {
       drive(true, 200, 80);     // Clear path, go forward
     }
   } else {
-    drive(true, 200, 0);         // Stop mode
+    drive(true, 200, 0);        // Stop mode
   }
 }
+
 
 void handleClient() {
   // Check if a client has connected
@@ -131,11 +139,11 @@ void handleClient() {
     // Send US data to website
     client.printf("{\"US1\":%.2f, \"US2\":%.2f, \"US3\":%.2f}", us1, us2, us3);
     
-  // Insert code to make the d-pad control working
-  // Start by pressing the buttons of the d pad and watch the serial console to see how the get requests look.
-   
   } 
   
+  // Insert code to make the d-pad control working
+  // Start by pressing the buttons of the d pad and watch the serial console to see how the get requests look.
+
   else if (request.indexOf("GET /up") >= 0) {
 
     drive(true, 300, 512);
@@ -172,7 +180,7 @@ void handleClient() {
 
 float measureDistance(uint8_t pin) {
   long duration;
-  float distance;
+  float   distance;
 
   // Trigger-Puls senden
   pinMode(pin, OUTPUT);
@@ -232,7 +240,6 @@ void setMotor(bool forward, uint16_t speed, bool motorA) {
   int8_t Motor2 = MOTOR_A2_PIN;
   uint16_t speedReverse = 0;
 
-  // Aufgabe 2
   if (!motorA){
     Motor1 = MOTOR_B1_PIN;
     Motor2 = MOTOR_B2_PIN;
