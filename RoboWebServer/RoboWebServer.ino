@@ -4,8 +4,8 @@
 #include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "iPhone Alex";
-const char* password = "spast2002";
+const char* ssid     = "KadensKerker";
+const char* password = "DippShitMidgetsshittinh88!";
 
 // Webserver on port 80 (standard http port)
 WiFiServer server(80);
@@ -33,7 +33,7 @@ bool teslaMode = false;
 
 void setup() {
   // Init serial
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Init motor pins as output
   for (size_t i = 0; i < sizeof(motorPins)/sizeof(motorPins[0]); i++) {
@@ -57,8 +57,9 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Uncomment if you want that the ESP creates an AP
+  
+  // You can remove the password parameter if you want the AP to be open.
   /*
-  // You can remove the password parameter if you want the AP to be open. 
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -83,16 +84,24 @@ void loop() {
   handleClient();
   // Update MDNS
   MDNS.update();
-  if (teslaMode) {
-    float distance = measureDistance(US1_PIN);  // z. B. D7, ersetze mit deinem Pin
+if (teslaMode) {
+    float d1 = measureDistance(US1_PIN);  // Left sensor
+    float d2 = measureDistance(US2_PIN);  // Center sensor
+    float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    if (distance > 0 && distance < 0.25) {  // Wenn Hindernis < 25 cm
-      turn(false, 400, 200);  // Rechts drehen
+    // Check if any sensor sees an obstacle within 50 cm
+    if ((d1 > 0 && d1 < 0.50) || 
+        (d2 > 0 && d2 < 0.50) || 
+        (d3 > 0 && d3 < 0.50)) {
+
+      turn(false, 400, 100);     // Turn right
+      delay(300);
+      drive(true, 200, 100);    // Move forward
     } else {
-      drive(true, 200, 180);  // Vorwärts fahren
+      drive(true, 200, 100);     // Clear path, go forward
     }
   } else {
-    drive(true, 200, 0);  // "Stopp" durch Fahrt mit Speed 0
+    drive(true, 200, 0);         // Stop mode
   }
 }
 
