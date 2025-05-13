@@ -84,21 +84,22 @@ void loop() {
   handleClient();
   // Update MDNS
   MDNS.update();
+
 if (teslaMode) {
     float d1 = measureDistance(US1_PIN);  // Left sensor
     float d2 = measureDistance(US2_PIN);  // Center sensor
     float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    // Check if any sensor sees an obstacle within 50 cm
-    if ((d1 > 0 && d1 < 0.50) || 
-        (d2 > 0 && d2 < 0.50) || 
-        (d3 > 0 && d3 < 0.50)) {
+    // Check if any sensor sees an obstacle within 30 cm
+    if ((d1 > 0 && d1 < 0.30) || 
+        (d2 > 0 && d2 < 0.30) || 
+        (d3 > 0 && d3 < 0.30)) {
 
-      turn(false, 400, 100);     // Turn right
+      turn(false, 400, 80);     // Turn right
       delay(300);
-      drive(true, 200, 100);    // Move forward
+      drive(true, 200, 80);    // Move forward
     } else {
-      drive(true, 200, 100);     // Clear path, go forward
+      drive(true, 200, 80);     // Clear path, go forward
     }
   } else {
     drive(true, 200, 0);         // Stop mode
@@ -190,7 +191,9 @@ float measureDistance(uint8_t pin) {
   }
 
   // Umrechnung von Mikrosekunden in Meter
-  distance = duration * 0.0001715; // (343 m/s / 2 / 1.000.000)
+  // Distance = (Speed of Sound × Time) / 2 x 100
+  // speed of Sound = 343m/s so in mirco seconds will be 0.0343 then we get at the end (duration(which is time) x 0.0343 / 2 x 100), which equals the formula at the end
+  distance = duration * 0.0001715; 
 
   // if(pin == 0){
   //   Serial.println(String(pin) + " Duration: " +  String(duration));
