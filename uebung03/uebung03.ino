@@ -1,4 +1,5 @@
 #define OUTPUT_PIN PB4  // Arduino Pin 12 = PB4
+#define NOTE_C6 1046
 
 void setup() {
     // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
@@ -38,9 +39,7 @@ void setTimer1Freq() {
     TCCR1B |= (1 << WGM12);
 
     // Set compare match value for 1046 Hz
-    // OCR1A = (F_CPU / (2 * prescaler * freq)) - 1
-    //        = (16_000_000 / (2 * 8 * 1046)) - 1 ≈ 952
-    OCR1A = 952;
+    OCR1A = (F_CPU / (2 * 8 * NOTE_C6)) - 1;
 
     // Enable Timer1 Compare A Match interrupt
     TIMSK1 |= (1 << OCIE1A);
