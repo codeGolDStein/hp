@@ -1,5 +1,7 @@
+// Aufgabe 2
 #define OUTPUT_PIN PB4  // Arduino Pin 12 = PB4
 #define NOTE_C6 1046
+// Aufgabe 3
 #define SOUND_PIN PB2   // Pin 10 = OC1B (for sound output)
 
 void setup() {
@@ -46,14 +48,14 @@ void setTimer1Freq(uint16_t freq) {
     // Set Pin 10 (PB2 = OC1B) as output
     DDRB |= (1 << SOUND_PIN);
 
-    /*
+    /* Wegen Aufgabe 2
     // Reset Timer1 registers
     TCCR1A = 0;
     TCCR1B = 0;
     TIMSK1 = 0;
     */
 
-    // Reset Timer1 control registers
+    // Reset Timer1 control registers (Aufgabe 3)
     TCCR1A = 0;
     TCCR1B = 0;
     TCNT1  = 0;
@@ -89,7 +91,7 @@ void setTimer1Freq(uint16_t freq) {
     sei(); // Enable global interrupts
 }
 
-/*
+/* Aufgabe 2
 // ISR toggles PB4 (Pin 12)
 ISR(TIMER1_COMPA_vect) {
     PINB |= (1 << OUTPUT_PIN); // Toggle pin
