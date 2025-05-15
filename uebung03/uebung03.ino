@@ -1,6 +1,10 @@
+#define OUTPUT_PIN PB4  // Arduino Pin 12 = PB4
+
 void setup() {
     // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
     DDRB |= (1 << PB5);
+    // Start tone at 1046 Hz
+    setTimer1Freq(); 
 }
 
 void loop() {
@@ -17,6 +21,39 @@ void setPin13(bool high) {
     } else {
         PORTB &= ~(1 << PB5);   // Lösche Bit 5 (Pin 13 low)
     }
+}
+
+void setTimer1Freq() {
+    cli(); // Disable global interrupts during setup
+
+    // Set Pin 12 (PB4) as output
+    DDRB |= (1 << OUTPUT_PIN);
+
+    // Reset Timer1 registers
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TIMSK1 = 0;
+
+    // Set CTC mode (WGM12 = 1, others = 0)
+    TCCR1B |= (1 << WGM12);
+
+    // Set compare match value for 1046 Hz
+    // OCR1A = (F_CPU / (2 * prescaler * freq)) - 1
+    //        = (16_000_000 / (2 * 8 * 1046)) - 1 ≈ 952
+    OCR1A = 952;
+
+    // Enable Timer1 Compare A Match interrupt
+    TIMSK1 |= (1 << OCIE1A);
+
+    // Set prescaler to 8 and start the timer
+    TCCR1B |= (1 << CS11);  // CS11 = prescaler 8
+
+    sei(); // Enable global interrupts
+}
+
+// ISR toggles PB4 (Pin 12)
+ISR(TIMER1_COMPA_vect) {
+    PINB |= (1 << OUTPUT_PIN); // Toggle pin
 }
 
 // Arduino-kompatibles Main für reine C-Umgebung
