@@ -5,8 +5,11 @@
 void setup() {
     // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
     DDRB |= (1 << PB5);
-    // Start tone at 1046 Hz
-    setTimer1Freq(); 
+
+    // setTimer1Freq(1046);  // C6
+    // setTimer1Freq(440);  // A4
+    // setTimer1Freq(880);  // A5
+    // setTimer1Freq(20000);  // Ignored → silent
 }
 
 void loop() {
@@ -25,7 +28,14 @@ void setPin13(bool high) {
     }
 }
 
-void setTimer1Freq() {
+void setTimer1Freq(uint16_t freq) {
+    // Frequenzgrenzen prüfen
+    if (freq < 100 || freq > 3000) {
+        // Frequenz ungültig → Timer stoppen und Pin auf LOW setzen
+        TCCR1B = 0;
+        PORTB &= ~(1 << SOUND_PIN);  // Setze Pin 10 auf LOW
+        return;
+    }
     cli(); // Disable global interrupts during setup
 
     /*
@@ -55,13 +65,24 @@ void setTimer1Freq() {
     TCCR1A |= (1 << COM1B0);  // Toggle OC1B on compare match
 
     // Set compare match value for 1046 Hz
-    OCR1A = (F_CPU / (2 * 8 * NOTE_C6)) - 1;
+    // Prescaler fest auf 8
+    uint16_t ocr = (F_CPU / (2 * 8 * freq)) - 1;
+
+    // Prüfen ob Wert in 16-Bit passt
+    if (ocr > 65535) {
+        // Wert zu groß → Timer deaktivieren
+        TCCR1B = 0;
+        PORTB &= ~(1 << SOUND_PIN);
+        return;
+    }
+
+    OCR1A = ocr;
 
     /*
     // Enable Timer1 Compare A Match interrupt
     TIMSK1 |= (1 << OCIE1A);
     */
-    
+
     // Set prescaler to 8 and start the timer
     TCCR1B |= (1 << CS11);  // CS11 = prescaler 8
 
