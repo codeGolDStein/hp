@@ -7,6 +7,18 @@
 // Neue globale Variable für den Timer-Zähler
 volatile uint32_t tCount = 0;
 
+/* Aufgabe 5*/
+// Letzte Zeit für die Sekunden-Ausgabe
+uint32_t lastPrintTime = 0;
+// Letzte Zeit für Frequenzwechsel
+uint32_t lastFreqChangeTime = 0;
+// Aktueller Frequenzindex
+uint8_t currentFreqIndex = 0;
+// Array mit verschiedenen Frequenzen für die Tonfolge
+uint16_t frequencies[] = {1046, 880, 659, 523, 440, 659, 880, 1046};
+uint8_t numFrequencies = 8;
+
+
 void setup() {
   // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
   DDRB |= (1 << PB5);
@@ -22,18 +34,6 @@ void setup() {
   // Starte mit einer Frequenz
   setTimer1Freq(1046); // C6
 }
-
-
-/* Aufgabe 5*/
-// Letzte Zeit für die Sekunden-Ausgabe
-uint32_t lastPrintTime = 0;
-// Letzte Zeit für Frequenzwechsel
-uint32_t lastFreqChangeTime = 0;
-// Aktueller Frequenzindex
-uint8_t currentFreqIndex = 0;
-// Array mit verschiedenen Frequenzen für die Tonfolge
-uint16_t frequencies[] = {1046, 880, 659, 523, 440, 659, 880, 1046};
-uint8_t numFrequencies = 8;
 
 void loop() {
   // Blinke LED unabhängig vom Ton
