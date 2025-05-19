@@ -142,6 +142,7 @@ void setTimer2(bool enable) {
 /*Aufgabe 5*/
 // ISR für Timer2 Compare Match A - wird alle 1ms aufgerufen
 ISR(TIMER2_COMPA_vect) {
+  // PINB |= (1 << OUTPUT_PIN); // Toggle pin
   tCount++; // Inkrementiere den globalen Zähler
 }
 
