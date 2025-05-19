@@ -18,6 +18,11 @@ uint8_t currentFreqIndex = 0;
 uint16_t frequencies[] = {1046, 880, 659, 523, 440, 659, 880, 1046};
 uint8_t numFrequencies = 8;
 
+// Aufgabe 6 – Melodie-Daten
+uint16_t notes[10] = { 262, 294, 330, 349, 392, 440, 494, 523, 587, 659 };      // z. B. C4–E5
+uint16_t durations[10] = { 200, 250, 300, 200, 250, 300, 400, 250, 200, 500 }; // Dauer je Ton (ms)
+volatile uint8_t melodyIdx = 0;  // Welcher Ton gerade gespielt wird
+
 
 void setup() {
   // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
@@ -28,11 +33,13 @@ void setup() {
   Serial.begin(38400);
   Serial.println("System gestartet");
   
+  playMelody();
+  
   // Aktiviere Timer2 für 1ms Interrupt
-  setTimer2(true);
+  //setTimer2(true);
   
   // Starte mit einer Frequenz
-  setTimer1Freq(1046); // C6
+  //setTimer1Freq(1046); // C6
 }
 
 void loop() {
@@ -139,11 +146,30 @@ void setTimer2(bool enable) {
   sei(); // Enable global interrupts
 }
 
+void playMelody() {
+  melodyIdx = 0;
+  tCount = 0;
+  setTimer1Freq(notes[melodyIdx]);
+  setTimer2(true);  // 1ms-Timer aktivieren
+}
+
 /*Aufgabe 5*/
 // ISR für Timer2 Compare Match A - wird alle 1ms aufgerufen
 ISR(TIMER2_COMPA_vect) {
   // PINB |= (1 << OUTPUT_PIN); // Toggle pin
   tCount++; // Inkrementiere den globalen Zähler
+
+  if (tCount >= durations[melodyIdx]) {
+    tCount = 0;
+    melodyIdx++;
+
+    if (melodyIdx < 10) {
+      setTimer1Freq(notes[melodyIdx]);
+    } else {
+      setTimer2(false);  // Alle 10 Töne gespielt → Timer2 aus
+      setTimer1Freq(0);  // Ton stoppen
+    }
+  }
 }
 
 // Arduino-kompatibles Main für reine C-Umgebung
