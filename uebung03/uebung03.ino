@@ -19,9 +19,9 @@ uint16_t frequencies[] = {1046, 880, 659, 523, 440, 659, 880, 1046};
 uint8_t numFrequencies = 8;
 
 // Aufgabe 6 – Melodie-Daten
-uint16_t notes[10] = { 262, 294, 330, 349, 392, 440, 494, 523, 587, 659 };      // z. B. C4–E5
-uint16_t durations[10] = { 200, 250, 300, 200, 250, 300, 400, 250, 200, 500 }; // Dauer je Ton (ms)
-volatile uint8_t melodyIdx = 0;  // Welcher Ton gerade gespielt wird
+uint16_t notes[10] = { 262, 294, 330, 349, 392, 440, 494, 523, 587, 659 }; 
+uint16_t durations[10] = { 200, 250, 300, 200, 250, 300, 400, 250, 200, 500 };
+volatile uint8_t melodyIdx = 0;  
 
 
 void setup() {
@@ -73,7 +73,7 @@ void setPin13(bool high) {
 void setTimer1Freq(uint16_t freq) {
   // Frequenzgrenzen prüfen
   if (freq < 100 || freq > 3000) {
-    // Frequenz ungültig → Timer stoppen und Pin auf LOW setzen
+    // Frequenz ungültig -> Timer stoppen und Pin auf LOW setzen
     TCCR1B = 0;
     PORTB &= ~(1 << SOUND_PIN); // Setze Pin 10 auf LOW
     return;
@@ -93,7 +93,7 @@ void setTimer1Freq(uint16_t freq) {
   TCCR1B |= (1 << WGM12);
   
   // Enable hardware toggle on OC1B (Pin 10)
-  TCCR1A |= (1 << COM1B0); // Toggle OC1B on compare match
+  TCCR1A |= (1 << COM1B0);
   
   // Set compare match value for 1046 Hz
   // Prescaler fest auf 8
@@ -101,7 +101,7 @@ void setTimer1Freq(uint16_t freq) {
   
   // Prüfen ob Wert in 16-Bit passt
   if (ocr > 65535) {
-    // Wert zu groß → Timer deaktivieren
+    // Wert zu groß -> deaktivieren
     TCCR1B = 0;
     PORTB &= ~(1 << SOUND_PIN);
     return;
@@ -157,7 +157,7 @@ void playMelody() {
 // ISR für Timer2 Compare Match A - wird alle 1ms aufgerufen
 ISR(TIMER2_COMPA_vect) {
   // PINB |= (1 << OUTPUT_PIN); // Toggle pin
-  tCount++; // Inkrementiere den globalen Zähler
+  tCount++; //globaler Zähler
 
   if (tCount >= durations[melodyIdx]) {
     tCount = 0;
