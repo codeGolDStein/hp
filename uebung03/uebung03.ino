@@ -3,6 +3,7 @@
 // Aufgabe 3
 #define SOUND_PIN PB2 // Pin 10 = OC1B (for sound output)
 
+/*Aufgabe 5*/
 // Neue globale Variable für den Timer-Zähler
 volatile uint32_t tCount = 0;
 
@@ -10,6 +11,7 @@ void setup() {
   // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
   DDRB |= (1 << PB5);
   
+  /*Aufgabe 5*/
   // Initialisiere die serielle Schnittstelle mit 38400 Baud
   Serial.begin(38400);
   Serial.println("System gestartet");
@@ -21,6 +23,8 @@ void setup() {
   setTimer1Freq(1046); // C6
 }
 
+
+/* Aufgabe 5*/
 // Letzte Zeit für die Sekunden-Ausgabe
 uint32_t lastPrintTime = 0;
 // Letzte Zeit für Frequenzwechsel
@@ -58,6 +62,7 @@ void setPin13(bool high) {
   }
 }
 
+/*Aufgabe 4 und so */
 void setTimer1Freq(uint16_t freq) {
   // Frequenzgrenzen prüfen
   if (freq < 100 || freq > 3000) {
@@ -103,6 +108,7 @@ void setTimer1Freq(uint16_t freq) {
   sei(); // Enable global interrupts
 }
 
+/*Aufgabe 5*/
 // Neue Funktion zum Konfigurieren von Timer2 für 1ms Interrupts
 void setTimer2(bool enable) {
   cli(); // Disable global interrupts during setup
@@ -133,6 +139,7 @@ void setTimer2(bool enable) {
   sei(); // Enable global interrupts
 }
 
+/*Aufgabe 5*/
 // ISR für Timer2 Compare Match A - wird alle 1ms aufgerufen
 ISR(TIMER2_COMPA_vect) {
   tCount++; // Inkrementiere den globalen Zähler
