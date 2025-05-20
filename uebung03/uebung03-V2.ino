@@ -44,6 +44,51 @@ uint16_t baseFrequencies[] = { 262, // C
   494  // B/H
 };
 
+
+
+
+void setup() {
+  // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
+  DDRB |= (1 << PB5);
+  
+  /*Aufgabe 5*/
+  // Initialisiere die serielle Schnittstelle mit 38400 Baud
+  Serial.begin(38400);
+  Serial.println("System gestartet");
+  
+  // RTTTL parsen
+  Serial.println("Starte RTTTL-Parser");
+  parseRTTTL(buffer);
+  Serial.println("RTTTL-Parser beendet");
+  
+  // Melody abspielen
+  playMelody();
+}
+
+void loop() {
+  // Blinke LED unabhängig vom Ton
+  setPin13((tCount % 1000) < 500);
+  
+  // Gib einmal pro Sekunde den aktuellen Timer-Zähler aus
+  if (tCount - lastPrintTime >= 1000) {
+    Serial.print("Timer Counter: ");
+    Serial.println(tCount);
+    Serial.print("Note: ");
+    Serial.print(melodyIdx);
+    if (melodyIdx < melodyLen) {
+      Serial.print(" (");
+      Serial.print(notes[melodyIdx]);
+      Serial.println(" Hz)");
+    } else {
+      Serial.println(" (Melodie beendet)");
+    }
+    lastPrintTime = tCount;
+  }
+}
+
+
+
+
 // Hilfsfunktionen für RTTTL-Parsing
 bool charIsDigit(char c) {
   return (c >= '0' && c <= '9');
@@ -225,45 +270,6 @@ void parseRTTTL(const char* rtttl) {
   Serial.print("Melodie mit ");
   Serial.print(melodyLen);
   Serial.println(" Noten geparst");
-}
-
-void setup() {
-  // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
-  DDRB |= (1 << PB5);
-  
-  /*Aufgabe 5*/
-  // Initialisiere die serielle Schnittstelle mit 38400 Baud
-  Serial.begin(38400);
-  Serial.println("System gestartet");
-  
-  // RTTTL parsen
-  Serial.println("Starte RTTTL-Parser");
-  parseRTTTL(buffer);
-  Serial.println("RTTTL-Parser beendet");
-  
-  // Melody abspielen
-  playMelody();
-}
-
-void loop() {
-  // Blinke LED unabhängig vom Ton
-  setPin13((tCount % 1000) < 500);
-  
-  // Gib einmal pro Sekunde den aktuellen Timer-Zähler aus
-  if (tCount - lastPrintTime >= 1000) {
-    Serial.print("Timer Counter: ");
-    Serial.println(tCount);
-    Serial.print("Note: ");
-    Serial.print(melodyIdx);
-    if (melodyIdx < melodyLen) {
-      Serial.print(" (");
-      Serial.print(notes[melodyIdx]);
-      Serial.println(" Hz)");
-    } else {
-      Serial.println(" (Melodie beendet)");
-    }
-    lastPrintTime = tCount;
-  }
 }
 
 void setPin13(bool high) {
