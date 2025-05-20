@@ -29,6 +29,7 @@ uint8_t melodyLen = 10; // Standardwert, wird beim Parsen aktualisiert
 // Aufgabe 7 - RTTTL Klingelton
 char buffer[] = "Bgirl:d=4,o=5,b=125:8g#,8e,8g#,8c#6,a,p,8f#,8d#,8f#,8b,g#,8f#,8e,p,8e,8c#,f#,c#,p,8f#,8e,g#,f#";
 
+
 // Basis-Frequenzen für die 4. Oktave
 uint16_t baseFrequencies[] = { 262, // C
   277, // C#
@@ -272,6 +273,7 @@ void parseRTTTL(const char* rtttl) {
   Serial.println(" Noten geparst");
 }
 
+/* Aufgabe 1 */
 void setPin13(bool high) {
   if (high) {
     PORTB |= (1 << PB5); // Setze Bit 5 (Pin 13 high)
