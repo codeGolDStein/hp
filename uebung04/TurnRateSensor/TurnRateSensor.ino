@@ -67,7 +67,6 @@ void setup()
   }
   
   gyroOffset = sum / numSamples;
-  offsetCalculated = true;
   
   // LCD für normale Anzeige vorbereiten
   lcd.clear();
@@ -94,25 +93,26 @@ void loop()
   lcd.print("   ");  // Überschreibt Restzeichen
   */
 
-  if(offsetCalculated) {
-
+  // Aufgabe 2
+  // #########################
     
-     // Aktuellen ADC-Wert lesen
-    int16_t analogValue = analogRead(A3);
-     
-     // Drehrate berechnen (aktueller Wert - Ruhewert)
-     int16_t turnRate = analogValue - gyroOffset;
-     
-     // ADC-Wert in erster Zeile anzeigen
-     lcd.setCursor(5, 0);
-     lcd.print(analogValue);
-     lcd.print("   ");  // Überschreibt Restzeichen
-     
-     // Drehrate in zweiter Zeile anzeigen
-     lcd.setCursor(11, 1);
-     lcd.print(turnRate);
-     lcd.print("   ");  // Überschreibt Restzeichen
-   }
+    // Aktuellen ADC-Wert lesen
+  int16_t analogValue = analogRead(A3);
+    
+  // Drehrate berechnen (aktueller Wert - Ruhewert)
+  int16_t turnRate = analogValue - gyroOffset;
+  
+  // ADC-Wert in erster Zeile anzeigen
+  lcd.setCursor(5, 0);
+  lcd.print(analogValue);
+  lcd.print("   ");  // Überschreibt Restzeichen
+  
+  // Drehrate in zweiter Zeile anzeigen
+  lcd.setCursor(11, 1);
+  lcd.print(turnRate);
+  lcd.print("   ");  // Überschreibt Restzeichen
+   
+   // #########################
 
 
 }
