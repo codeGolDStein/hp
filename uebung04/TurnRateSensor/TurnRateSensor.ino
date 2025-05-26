@@ -20,6 +20,7 @@
 // include LCD functions:
 #include <LiquidCrystal.h> 
 
+
 // define the LCD screen
 LiquidCrystal lcd(11, 12, 13, A0, A1, A2);
 
@@ -38,6 +39,11 @@ const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTO
 // Variable für den Ruhewert des Sensors
 int16_t gyroOffset = 0;
 bool offsetCalculated = false;
+
+// Aufgabe 3
+unsigned long lastMicros = 0;
+long heading_int = 0;
+const int DEADZONE = 5;  // Turnrate unterhalb dieses Werts wird ignoriert
 
 
 // initialization
@@ -68,6 +74,8 @@ void setup()
   
   gyroOffset = sum / numSamples;
   
+  lastMicros = micros();  // Initiale Zeit merken
+
   // LCD für normale Anzeige vorbereiten
   lcd.clear();
 
@@ -112,9 +120,27 @@ void loop()
   lcd.print(turnRate);
   lcd.print("   ");  // Überschreibt Restzeichen
    
-   // #########################
+  // #########################
 
 
+  // Aufgabe 3
+  // #########################
+  // Zeit berechnen
+  unsigned long currentMicros = micros();
+  float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
+  lastMicros = currentMicros;
+
+  // Deadzone einführen (Sensorrauschen ignorieren)
+  if (abs(turnRate) > DEADZONE) {
+    heading_int += turnRate * deltaTime;  // Integration
+  }
+
+  // Ausgabe in Zeile 3
+  lcd.setCursor(0, 2);  // dritte Zeile
+  lcd.print("heading_int: ");
+  lcd.print(heading_int);
+  lcd.print("   ");
+  // #########################
 }
 
 
