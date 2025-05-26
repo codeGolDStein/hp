@@ -96,7 +96,7 @@ void loop()
 
   if(offsetCalculated) {
 
-    delay(100);
+    
      // Aktuellen ADC-Wert lesen
     int16_t analogValue = analogRead(A3);
      
@@ -115,7 +115,6 @@ void loop()
    }
 
 
-   
 }
 
 
