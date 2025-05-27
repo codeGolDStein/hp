@@ -101,10 +101,8 @@ void loop()
   lcd.print("   ");  // Überschreibt Restzeichen
   */
 
-  // Aufgabe 2
-  // #########################
-    
-    // Aktuellen ADC-Wert lesen
+  /* Aufgabe 2   */
+  // Aktuellen ADC-Wert lesen
   int16_t analogValue = analogRead(A3);
     
   // Drehrate berechnen (aktueller Wert - Ruhewert)
@@ -120,22 +118,18 @@ void loop()
   lcd.print(turnRate);
   lcd.print("   ");  // Überschreibt Restzeichen
    
-  // #########################
 
-
-  // Aufgabe 3
-  // #########################
+  /* Aufgabe 3 */
   // Zeit berechnen
   unsigned long currentMicros = micros();
   float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
   lastMicros = currentMicros;
 
-  // Deadzone einführen (Sensorrauschen ignorieren)
+  // Deadzone einführen 
   if (abs(turnRate) > DEADZONE) {
-    heading_int += turnRate * deltaTime;  // Integration
+    heading_int += turnRate * deltaTime;
   }
 
-  // Ausgabe in Zeile 3
   lcd.setCursor(0, 2);  // dritte Zeile
   lcd.print("heading_int: ");
   lcd.print(heading_int);
@@ -165,4 +159,3 @@ set the current write position of the lcd to specific line and row:
 write onto lcd, starting at current position:
   lcd.print("abc");
 */
-
