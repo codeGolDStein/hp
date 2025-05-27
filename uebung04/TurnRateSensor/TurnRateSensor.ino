@@ -38,14 +38,14 @@ bool offsetCalculated = false;
 
 // Aufgabe 3
 unsigned long lastMicros = 0;
-long heading_int = 0;
+float heading_int = 0;
 const int DEADZONE = 5;  // Turnrate unterhalb dieses Werts wird ignoriert
 
 // Aufgabe 6 - Zustandsautomat Variablen
-char state = '0';  // Zustand: '0' = drive forward, '1' = rotate right
-unsigned long timer = 0;  // Timer in Millisekunden
-int targetHeading = 0;  // Zielrichtung in Grad
-const int TOLERANCE = 2;  // Toleranzbereich für heading Vergleich
+int state = 0;
+unsigned long lastTime = 0;
+unsigned long timer = 0;
+float targetHeading = 0;
 
 // initialization
 void setup()
@@ -124,71 +124,53 @@ void loop()
     heading_int += turnRate * deltaTime;
   }
 
-  // Aufgabe 4
-  const float SCALE_FACTOR = 0.71;
-  int heading_deg = ((int)(heading_int * SCALE_FACTOR)) % 360;
-  if (heading_deg < 0) heading_deg += 360;
+    // Aufgabe 4
+    const float SCALE_FACTOR = 0.71;
+    int heading = (int)(fmod((heading_int * SCALE_FACTOR), 360.0));
+    if (heading < 0) heading += 360;
 
-  lcd.setCursor(0, 2);  // dritte Zeile
-  lcd.print("heading: ");
-  lcd.print(heading_deg);
-  lcd.print((char)223);  // Gradzeichen
-  lcd.print("   ");
+    lcd.setCursor(0, 2);  // dritte Zeile
+    lcd.print("heading: ");
+    lcd.print(heading);
+    lcd.print((char)223);  // Gradzeichen
+    lcd.print("   ");
 
   // Aufgabe 6 - Zustandsautomat
   unsigned long currentTime = millis();
-  
-  // Zustandsautomat
-  if (state == '0') {  // State 0: drive forward
-    // Vorwärts fahren
-    setMotor(true, 80, true);   // Motor A vorwärts
-    setMotor(true, 80, false);  // Motor B vorwärts
-    
-    // Prüfen ob 4 Sekunden vergangen sind
-    if (currentTime - timer >= 4000) {
-      // --> State 1
-      state = '1';
-      // Zielrichtung berechnen (aktueller heading + 120)
-      targetHeading = (heading_deg + 120) % 360;
-      // Timer reset
-      timer = currentTime;
-    }
-  }
-  else if (state == '1') {  // rotate right
-    // Rechts drehen (Motor A vorwärts, Motor B rückwärts)
-    setMotor(true, 50, true);    // Motor A vorwärts
-    setMotor(false, 50, false);  // Motor B rückwärts
-    
-    // Prüfen ob Zielrichtung erreicht ist
-    int headingDiff = abs(heading_deg - targetHeading);
-    
-    // edge cases
-    if (headingDiff > 180) {
-      headingDiff = 360 - headingDiff;
-    }
-    
-    // edge case >= 358 und <= 1 Grad
-    bool targetReached = false;
-    if (targetHeading >= 358 || targetHeading <= 1) {
-      // edge case 0 deg
-      if ((heading_deg >= 358 && heading_deg <= 359) || 
-          (heading_deg >= 0 && heading_deg <= 2)) {
-        if (abs(heading_deg - targetHeading) <= TOLERANCE ||
-            abs((heading_deg + 360) - targetHeading) <= TOLERANCE ||
-            abs(heading_deg - (targetHeading + 360)) <= TOLERANCE) {
-          targetReached = true;
-        }
+  float dt = (currentTime - lastTime) / 1000.0;  // in Sekunden
+
+  // Jetzt erst lastTime updaten!
+  lastTime = currentTime;
+
+  float currentHeading = heading;
+
+  switch (state) {
+    case 0:
+      // drehen
+      setMotor(true, 70, true);
+      setMotor(false, 70, false);
+      timer += dt;
+
+      if (timer >= 4.0) {
+        targetHeading = currentHeading + 120;
+        if (targetHeading >= 360) targetHeading -= 360;
+
+        state = 1;
+        timer = 0;
       }
-    } else {
-      // Normale Toleranzprüfung
-      targetReached = (headingDiff <= TOLERANCE);
-    }
-    
-    if (targetReached) {
-      // --> State 0
-      state = '0';
-      timer = currentTime;  // set timer
-    }
+      break;
+
+    case 1:
+      // vorwärts fahren
+      setMotor(true, 20, true);
+      setMotor(true, 40, false);
+
+      float delta = abs(currentHeading - targetHeading);
+      if (delta < 2 || delta > 358) {
+        state = 0;
+        timer = 0;
+      }
+      break;
   }
 
   // targetHeading auf LCD anzeigen (dritte Zeile, kommentiert heading_int aus)
