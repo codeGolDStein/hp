@@ -20,12 +20,8 @@
 // include LCD functions:
 #include <LiquidCrystal.h> 
 
-
 // define the LCD screen
 LiquidCrystal lcd(11, 12, 13, A0, A1, A2);
-
-
-//LiquidCrystal lcd(R_S, E, DB4, DB5, DB6, DB7);
 
 // Pins of motor
 #define PIN_MOTOR_A1 5
@@ -45,6 +41,11 @@ unsigned long lastMicros = 0;
 long heading_int = 0;
 const int DEADZONE = 5;  // Turnrate unterhalb dieses Werts wird ignoriert
 
+// Aufgabe 6 - Zustandsautomat Variablen
+char state = '0';  // Zustand: '0' = drive forward, '1' = rotate right
+unsigned long timer = 0;  // Timer in Millisekunden
+int targetHeading = 0;  // Zielrichtung in Grad
+const int TOLERANCE = 2;  // Toleranzbereich für heading Vergleich
 
 // initialization
 void setup()
@@ -53,6 +54,11 @@ void setup()
   pinMode(A0, OUTPUT);
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
+  
+  // Motor Pins als Ausgänge konfigurieren
+  for(int i = 0; i < 4; i++) {
+    pinMode(motorPins[i], OUTPUT);
+  }
 
   lcd.clear();
   lcd.begin(20, 4); 
@@ -75,6 +81,7 @@ void setup()
   gyroOffset = sum / numSamples;
   
   lastMicros = micros();  // Initiale Zeit merken
+  timer = millis();  // Timer initialisieren
 
   // LCD für normale Anzeige vorbereiten
   lcd.clear();
@@ -89,18 +96,6 @@ void setup()
 
 void loop()
 { 
-  /* --> Aufgabe 1
-  // read the current analog value on a3
-  int16_t analogValue = analogRead(A3);
-  // implement your code here:
-
-    
-  lcd.setCursor(0, 0);  // Zeile 1, Position 0
-  lcd.print("ADC: ");
-  lcd.print(analogValue);
-  lcd.print("   ");  // Überschreibt Restzeichen
-  */
-
   /* Aufgabe 2   */
   // Aktuellen ADC-Wert lesen
   int16_t analogValue = analogRead(A3);
@@ -118,7 +113,6 @@ void loop()
   lcd.print(turnRate);
   lcd.print("   ");  // Überschreibt Restzeichen
    
-
   /* Aufgabe 3 */
   // Zeit berechnen
   unsigned long currentMicros = micros();
@@ -130,27 +124,104 @@ void loop()
     heading_int += turnRate * deltaTime;
   }
 
-  lcd.setCursor(0, 2);  // dritte Zeile
-  lcd.print("heading_int: ");
-  lcd.print(heading_int);
-  lcd.print("   ");
-  // #########################
-
   // Aufgabe 4
-  // #########################
-  const float SCALE_FACTOR = 0.74;
+  const float SCALE_FACTOR = 0.71;
   int heading_deg = ((int)(heading_int * SCALE_FACTOR)) % 360;
   if (heading_deg < 0) heading_deg += 360;
 
-  lcd.setCursor(0, 3);  // vierte Zeile
+  lcd.setCursor(0, 2);  // dritte Zeile
   lcd.print("heading: ");
   lcd.print(heading_deg);
   lcd.print((char)223);  // Gradzeichen
-  lcd.print("    ");
-  // #########################
+  lcd.print("   ");
 
+  // Aufgabe 6 - Zustandsautomat
+  unsigned long currentTime = millis();
+  
+  // Zustandsautomat
+  if (state == '0') {  // State 0: drive forward
+    // Vorwärts fahren
+    setMotor(true, 150, true);   // Motor A vorwärts
+    setMotor(true, 150, false);  // Motor B vorwärts
+    
+    // Prüfen ob 4 Sekunden vergangen sind
+    if (currentTime - timer >= 4000) {  // 4 Sekunden = 4000ms
+      // Übergang zu State 1
+      state = '1';
+      // Zielrichtung berechnen (aktueller heading + 120°)
+      targetHeading = (heading_deg + 120) % 360;
+      timer = 0;  // Timer zurücksetzen (wird nicht mehr für Zeit verwendet)
+    }
+  }
+  else if (state == '1') {  // State 1: rotate right
+    // Rechts drehen (Motor A vorwärts, Motor B rückwärts)
+    setMotor(true, 100, true);    // Motor A vorwärts
+    setMotor(false, 100, false);  // Motor B rückwärts
+    
+    // Prüfen ob Zielrichtung erreicht ist (mit Toleranz)
+    int headingDiff = abs(heading_deg - targetHeading);
+    
+    // Behandlung des Grenzfalls (z.B. 359° zu 1°)
+    if (headingDiff > 180) {
+      headingDiff = 360 - headingDiff;
+    }
+    
+    // Separate Behandlung der Grenzfälle >= 358 und <= 1 Grad
+    bool targetReached = false;
+    if (targetHeading >= 358 || targetHeading <= 1) {
+      // Spezialbehandlung für Bereich um 0°
+      if ((heading_deg >= 358 && heading_deg <= 359) || 
+          (heading_deg >= 0 && heading_deg <= 2)) {
+        if (abs(heading_deg - targetHeading) <= TOLERANCE ||
+            abs((heading_deg + 360) - targetHeading) <= TOLERANCE ||
+            abs(heading_deg - (targetHeading + 360)) <= TOLERANCE) {
+          targetReached = true;
+        }
+      }
+    } else {
+      // Normale Toleranzprüfung
+      targetReached = (headingDiff <= TOLERANCE);
+    }
+    
+    if (targetReached) {
+      // Übergang zu State 0
+      state = '0';
+      timer = currentTime;  // Timer für nächste 4-Sekunden-Phase setzen
+    }
+  }
+
+  // targetHeading auf LCD anzeigen (dritte Zeile, kommentiert heading_int aus)
+  lcd.setCursor(0, 3);  // vierte Zeile
+  lcd.print("target: ");
+  lcd.print(targetHeading);
+  lcd.print((char)223);  // Gradzeichen
+  lcd.print(" S:");
+  lcd.print(state);
+  lcd.print("  ");
 }
 
+// setMotor: Steuert einen Motor (A oder B) mit Richtung und Geschwindigkeit
+// forward: true = vorwärts, false = rückwärts
+// speed: PWM-Wert (0-255)
+// motorA: true = Motor A, false = Motor B
+void setMotor(bool forward, uint8_t speed, bool motorA) {
+  int pin1, pin2;
+  if (motorA) {
+    pin1 = PIN_MOTOR_A1;
+    pin2 = PIN_MOTOR_A2;
+  } else {
+    pin1 = PIN_MOTOR_B1;
+    pin2 = PIN_MOTOR_B2;
+  }
+
+  if (forward) {
+    analogWrite(pin1, speed);      // PWM-Signal für Vorwärtsrichtung
+    digitalWrite(pin2, LOW);       // Andere Richtung auf LOW
+  } else {
+    digitalWrite(pin1, LOW);       // Diese Richtung auf LOW
+    analogWrite(pin2, speed);      // PWM-Signal für Rückwärtsrichtung
+  }
+}
 
 /* Usefull LCD functions:
 set the current write position of the lcd to specific line and row:
