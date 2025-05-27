@@ -141,35 +141,36 @@ void loop()
   // Zustandsautomat
   if (state == '0') {  // State 0: drive forward
     // Vorwärts fahren
-    setMotor(true, 150, true);   // Motor A vorwärts
-    setMotor(true, 150, false);  // Motor B vorwärts
+    setMotor(true, 50, true);   // Motor A vorwärts
+    setMotor(true, 50, false);  // Motor B vorwärts
     
     // Prüfen ob 4 Sekunden vergangen sind
-    if (currentTime - timer >= 4000) {  // 4 Sekunden = 4000ms
-      // Übergang zu State 1
+    if (currentTime - timer >= 4000) {
+      // --> State 1
       state = '1';
-      // Zielrichtung berechnen (aktueller heading + 120°)
+      // Zielrichtung berechnen (aktueller heading + 120)
       targetHeading = (heading_deg + 120) % 360;
-      timer = 0;  // Timer zurücksetzen (wird nicht mehr für Zeit verwendet)
+      // Timer reset
+      timer = 0;
     }
   }
-  else if (state == '1') {  // State 1: rotate right
+  else if (state == '1') {  // rotate right
     // Rechts drehen (Motor A vorwärts, Motor B rückwärts)
     setMotor(true, 100, true);    // Motor A vorwärts
     setMotor(false, 100, false);  // Motor B rückwärts
     
-    // Prüfen ob Zielrichtung erreicht ist (mit Toleranz)
+    // Prüfen ob Zielrichtung erreicht ist
     int headingDiff = abs(heading_deg - targetHeading);
     
-    // Behandlung des Grenzfalls (z.B. 359° zu 1°)
+    // edge cases
     if (headingDiff > 180) {
       headingDiff = 360 - headingDiff;
     }
     
-    // Separate Behandlung der Grenzfälle >= 358 und <= 1 Grad
+    // edge case >= 358 und <= 1 Grad
     bool targetReached = false;
     if (targetHeading >= 358 || targetHeading <= 1) {
-      // Spezialbehandlung für Bereich um 0°
+      // edge case 0 deg
       if ((heading_deg >= 358 && heading_deg <= 359) || 
           (heading_deg >= 0 && heading_deg <= 2)) {
         if (abs(heading_deg - targetHeading) <= TOLERANCE ||
@@ -184,25 +185,26 @@ void loop()
     }
     
     if (targetReached) {
-      // Übergang zu State 0
+      // --> State 0
       state = '0';
-      timer = currentTime;  // Timer für nächste 4-Sekunden-Phase setzen
+      timer = currentTime;  // set timer
     }
   }
 
   // targetHeading auf LCD anzeigen (dritte Zeile, kommentiert heading_int aus)
-  lcd.setCursor(0, 3);  // vierte Zeile
+  lcd.setCursor(0, 3);  // 4te Zeile
   lcd.print("target: ");
   lcd.print(targetHeading);
-  lcd.print((char)223);  // Gradzeichen
+  lcd.print((char)223);  // deg
   lcd.print(" S:");
   lcd.print(state);
   lcd.print("  ");
 }
 
+/*Aufgabe 5*/
 // setMotor: Steuert einen Motor (A oder B) mit Richtung und Geschwindigkeit
 // forward: true = vorwärts, false = rückwärts
-// speed: PWM-Wert (0-255)
+// speed: (0-255)
 // motorA: true = Motor A, false = Motor B
 void setMotor(bool forward, uint8_t speed, bool motorA) {
   int pin1, pin2;
@@ -215,11 +217,11 @@ void setMotor(bool forward, uint8_t speed, bool motorA) {
   }
 
   if (forward) {
-    analogWrite(pin1, speed);      // PWM-Signal für Vorwärtsrichtung
-    digitalWrite(pin2, LOW);       // Andere Richtung auf LOW
+    analogWrite(pin1, speed);      // forwards
+    digitalWrite(pin2, LOW);
   } else {
-    digitalWrite(pin1, LOW);       // Diese Richtung auf LOW
-    analogWrite(pin2, speed);      // PWM-Signal für Rückwärtsrichtung
+    digitalWrite(pin1, LOW);
+    analogWrite(pin2, speed);      // backwards
   }
 }
 
