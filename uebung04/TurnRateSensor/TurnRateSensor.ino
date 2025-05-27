@@ -141,8 +141,8 @@ void loop()
   // Zustandsautomat
   if (state == '0') {  // State 0: drive forward
     // Vorwärts fahren
-    setMotor(true, 50, true);   // Motor A vorwärts
-    setMotor(true, 50, false);  // Motor B vorwärts
+    setMotor(true, 80, true);   // Motor A vorwärts
+    setMotor(true, 80, false);  // Motor B vorwärts
     
     // Prüfen ob 4 Sekunden vergangen sind
     if (currentTime - timer >= 4000) {
@@ -151,7 +151,7 @@ void loop()
       // Zielrichtung berechnen (aktueller heading + 120)
       targetHeading = (heading_deg + 120) % 360;
       // Timer reset
-      timer = 0;
+      timer = currentTime;
     }
   }
   else if (state == '1') {  // rotate right
