@@ -141,6 +141,20 @@ void loop()
   lcd.print(heading_int);
   lcd.print("   ");
   // #########################
+
+  // Aufgabe 4
+  // #########################
+  const float SCALE_FACTOR = 0.63;
+  int heading_deg = ((int)(heading_int * SCALE_FACTOR)) % 360;
+  if (heading_deg < 0) heading_deg += 360;
+
+  lcd.setCursor(0, 3);  // vierte Zeile
+  lcd.print("heading: ");
+  lcd.print(heading_deg);
+  lcd.print((char)223);  // Gradzeichen
+  lcd.print("    ");
+  // #########################
+
 }
 
 
