@@ -138,7 +138,7 @@ void loop()
 
   // Aufgabe 4
   // #########################
-  const float SCALE_FACTOR = 0.63;
+  const float SCALE_FACTOR = 0.74;
   int heading_deg = ((int)(heading_int * SCALE_FACTOR)) % 360;
   if (heading_deg < 0) heading_deg += 360;
 
