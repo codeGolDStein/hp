@@ -156,8 +156,8 @@ void loop()
   }
   else if (state == '1') {  // rotate right
     // Rechts drehen (Motor A vorwärts, Motor B rückwärts)
-    setMotor(true, 100, true);    // Motor A vorwärts
-    setMotor(false, 100, false);  // Motor B rückwärts
+    setMotor(true, 50, true);    // Motor A vorwärts
+    setMotor(false, 50, false);  // Motor B rückwärts
     
     // Prüfen ob Zielrichtung erreicht ist
     int headingDiff = abs(heading_deg - targetHeading);
@@ -217,11 +217,11 @@ void setMotor(bool forward, uint8_t speed, bool motorA) {
   }
 
   if (forward) {
-    analogWrite(pin1, speed);      // forwards
-    digitalWrite(pin2, LOW);
+    digitalWrite(pin1, LOW);      // pin1 = 0
+    analogWrite(pin2, speed);     // pin2 = PWM
   } else {
-    digitalWrite(pin1, LOW);
-    analogWrite(pin2, speed);      // backwards
+    analogWrite(pin1, speed);     // pin1 = PWM
+    digitalWrite(pin2, LOW);      // pin2 = 0
   }
 }
 
