@@ -34,7 +34,6 @@ const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTO
 /*Aufgabe 2*/
 // Variable für den Ruhewert des Sensors
 int16_t gyroOffset = 0;
-bool offsetCalculated = false;
 
 // Aufgabe 3
 //unsigned long lastMicros = 0;
@@ -47,7 +46,6 @@ int targetHeading = 0;  // Zielrichtung in Grad
 const int8_t TOLERANCE = 2;  // Toleranzbereich für heading Vergleich
 
 unsigned long timerState = 0;
-
 int16_t turnRate = 0;
 
 // initialization
@@ -86,7 +84,9 @@ void setup()
   
   // last Micros?? was das 
   //lastMicros = micros();  // Initiale Zeit merken
-  timer = millis();  // Timer initialisieren
+
+  // Timer initialisieren
+  timer = millis();
 
   // LCD für normale Anzeige vorbereiten
   lcd.clear();
@@ -121,20 +121,22 @@ void loop()
   lcd.print("   ");  // Überschreibt Restzeichen
    
   /* Aufgabe 3 */
+  /*
   // Zeit berechnen
-  //unsigned long currentMicros = micros();
-  //float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
-  //lastMicros = currentMicros;
-
+  unsigned long currentMicros = micros();
+  float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
+  lastMicros = currentMicros;
+  */
 
   // Aufgabe 4
-/*  
+  /*  
   const float SCALE_FACTOR = 0.71;
   //int heading = ((int)(heading_int * SCALE_FACTOR)) % 360;
   int heading = (int)(fmod((heading_int * SCALE_FACTOR), 360.0));
   if (heading < 0) heading += 360;
-*/
-  int heading = calc_heading();
+  */
+  
+  int heading = getHeading();
 
   lcd.setCursor(0, 2);  // dritte Zeile
   lcd.print("heading: ");
@@ -143,7 +145,6 @@ void loop()
   lcd.print("   ");
 
   
-
   // Aufgabe 6 - Zustandsautomat
   
   // do actions in state
@@ -203,15 +204,16 @@ void doState(int heading) {
 }
 
 // berechne aktuelle drehung
-int calc_heading() {
+int getHeading() {
   int16_t analogValue = analogRead(A3);
   turnRate = gyroOffset - analogValue;
-  unsigned long time2 = millis();
+  unsigned long headingTimer = millis();
   if (!(turnRate <= 5 and turnRate >= -5)) {
-    heading_int += turnRate * (time2- timer);
+    heading_int += turnRate * (headingTimer- timer);
   }
-  timer = time2;
-  int heading = (heading_int / 2280) % 360; // 3138 is scale factor
+  timer = headingTimer;
+  // Sklarieungsfaktor  = 2280
+  int heading = (heading_int / 2280) % 360;
   if (heading < 0) {
    heading += 360;
   }
@@ -223,7 +225,6 @@ int calc_heading() {
 /*Aufgabe 5*/
 // setMotor: Steuert einen Motor (A oder B) mit Richtung und Geschwindigkeit
 // forward: true = vorwärts, false = rückwärts
-// speed: Geschwindigkeit (0-255)
 // motorA: true = Motor A, false = Motor B
 void setMotor(bool forward, uint8_t speed, bool motorA) {
   int pin1, pin2;
