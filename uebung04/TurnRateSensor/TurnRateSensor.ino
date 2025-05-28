@@ -37,15 +37,18 @@ int16_t gyroOffset = 0;
 bool offsetCalculated = false;
 
 // Aufgabe 3
-unsigned long lastMicros = 0;
-float heading_int = 0;
-const int DEADZONE = 5;  // Turnrate unterhalb dieses Werts wird ignoriert
+//unsigned long lastMicros = 0;
+long heading_int = 0;
 
 // Aufgabe 6 - Zustandsautomat Variablen
-int state = 0;
-unsigned long lastTime = 0;
-unsigned long timer = 0;
-float targetHeading = 0;
+char state = '0';  // Zustand: '0' = drive forward, '1' = rotate right
+unsigned long timer = 0;  // Timer in Millisekunden
+int targetHeading = 0;  // Zielrichtung in Grad
+const int8_t TOLERANCE = 2;  // Toleranzbereich für heading Vergleich
+
+unsigned long timerState = 0;
+
+int16_t turnRate = 0;
 
 // initialization
 void setup()
@@ -54,6 +57,7 @@ void setup()
   pinMode(A0, OUTPUT);
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
+  
   
   // Motor Pins als Ausgänge konfigurieren
   for(int i = 0; i < 4; i++) {
@@ -80,7 +84,8 @@ void setup()
   
   gyroOffset = sum / numSamples;
   
-  lastMicros = micros();  // Initiale Zeit merken
+  // last Micros?? was das 
+  //lastMicros = micros();  // Initiale Zeit merken
   timer = millis();  // Timer initialisieren
 
   // LCD für normale Anzeige vorbereiten
@@ -92,6 +97,8 @@ void setup()
   lcd.setCursor(0, 1);
   lcd.print("turn-rate: ");
   
+  timerState = timer + 4000;
+
 }
 
 void loop()
@@ -101,7 +108,7 @@ void loop()
   int16_t analogValue = analogRead(A3);
     
   // Drehrate berechnen (aktueller Wert - Ruhewert)
-  int16_t turnRate = analogValue - gyroOffset;
+  //int16_t turnRate = analogValue - gyroOffset;
   
   // ADC-Wert in erster Zeile anzeigen
   lcd.setCursor(5, 0);
@@ -115,63 +122,32 @@ void loop()
    
   /* Aufgabe 3 */
   // Zeit berechnen
-  unsigned long currentMicros = micros();
-  float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
-  lastMicros = currentMicros;
+  //unsigned long currentMicros = micros();
+  //float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
+  //lastMicros = currentMicros;
 
-  // Deadzone einführen 
-  if (abs(turnRate) > DEADZONE) {
-    heading_int += turnRate * deltaTime;
-  }
 
-    // Aufgabe 4
-    const float SCALE_FACTOR = 0.71;
-    int heading = (int)(fmod((heading_int * SCALE_FACTOR), 360.0));
-    if (heading < 0) heading += 360;
+  // Aufgabe 4
+/*  
+  const float SCALE_FACTOR = 0.71;
+  //int heading = ((int)(heading_int * SCALE_FACTOR)) % 360;
+  int heading = (int)(fmod((heading_int * SCALE_FACTOR), 360.0));
+  if (heading < 0) heading += 360;
+*/
+  int heading = calc_heading();
 
-    lcd.setCursor(0, 2);  // dritte Zeile
-    lcd.print("heading: ");
-    lcd.print(heading);
-    lcd.print((char)223);  // Gradzeichen
-    lcd.print("   ");
+  lcd.setCursor(0, 2);  // dritte Zeile
+  lcd.print("heading: ");
+  lcd.print(heading);
+  lcd.print((char)223);  // Gradzeichen
+  lcd.print("   ");
+
+  
 
   // Aufgabe 6 - Zustandsautomat
-  unsigned long currentTime = millis();
-  float dt = (currentTime - lastTime) / 1000.0;  // in Sekunden
-
-  // Jetzt erst lastTime updaten!
-  lastTime = currentTime;
-
-  float currentHeading = heading;
-
-  switch (state) {
-    case 0:
-      // drehen
-      setMotor(true, 70, true);
-      setMotor(false, 70, false);
-      timer += dt;
-
-      if (timer >= 4.0) {
-        targetHeading = currentHeading + 120;
-        if (targetHeading >= 360) targetHeading -= 360;
-
-        state = 1;
-        timer = 0;
-      }
-      break;
-
-    case 1:
-      // vorwärts fahren
-      setMotor(true, 20, true);
-      setMotor(true, 40, false);
-
-      float delta = abs(currentHeading - targetHeading);
-      if (delta < 2 || delta > 358) {
-        state = 0;
-        timer = 0;
-      }
-      break;
-  }
+  
+  // do actions in state
+  doState(heading);
 
   // targetHeading auf LCD anzeigen (dritte Zeile, kommentiert heading_int aus)
   lcd.setCursor(0, 3);  // 4te Zeile
@@ -183,13 +159,75 @@ void loop()
   lcd.print("  ");
 }
 
+
+void doState(int heading) {
+
+  // Zustandsautomat
+  if (state == '0') {  // State 0: drive forward
+
+    // Vorwärts fahren
+    setMotor(true, 50, true);   // Motor A vorwärts
+    setMotor(true, 50, false);  // Motor B vorwärts
+    
+    // Prüfen ob 4 Sekunden vergangen sind
+    if (millis() >= timerState) {
+      // --> State 1
+      state = '1';
+      // Zielrichtung berechnen (aktueller heading + 120)
+      targetHeading = (heading + 120) % 360;
+      // Timer reset
+      //timer = currentTime;
+    }
+  }
+  else if (state == '1') {  // rotate right
+    // Rechts drehen (Motor A vorwärts, Motor B rückwärts)
+    setMotor(true, 50, true);    // Motor A vorwärts
+    setMotor(false, 50, false);  // Motor B rückwärts
+    
+    int TOLERANCE = 3;
+    bool targetReached = false;
+
+    // Prüfen ob Zielrichtung erreicht ist
+    if ((heading - targetHeading) <= TOLERANCE && (heading - targetHeading) > -1 ) {targetReached = true;}
+
+    if (targetReached) {
+      // --> State 0
+      state = '0';
+      heading_int = 0;
+      // set to current time plus 4000
+      timerState = millis() + 4000;  // Set next target time
+    }
+  }
+  
+
+}
+
+// berechne aktuelle drehung
+int calc_heading() {
+  int16_t analogValue = analogRead(A3);
+  turnRate = gyroOffset - analogValue;
+  unsigned long time2 = millis();
+  if (!(turnRate <= 5 and turnRate >= -5)) {
+    heading_int += turnRate * (time2- timer);
+  }
+  timer = time2;
+  int heading = (heading_int / 2280) % 360; // 3138 is scale factor
+  if (heading < 0) {
+   heading += 360;
+  }
+   
+  return heading;
+}
+
+
 /*Aufgabe 5*/
 // setMotor: Steuert einen Motor (A oder B) mit Richtung und Geschwindigkeit
 // forward: true = vorwärts, false = rückwärts
-// speed: (0-255)
+// speed: Geschwindigkeit (0-255)
 // motorA: true = Motor A, false = Motor B
 void setMotor(bool forward, uint8_t speed, bool motorA) {
   int pin1, pin2;
+  
   if (motorA) {
     pin1 = PIN_MOTOR_A1;
     pin2 = PIN_MOTOR_A2;
@@ -199,11 +237,11 @@ void setMotor(bool forward, uint8_t speed, bool motorA) {
   }
 
   if (forward) {
-    digitalWrite(pin1, LOW);      // pin1 = 0
-    analogWrite(pin2, speed);     // pin2 = PWM
+    digitalWrite(pin1, LOW);      // pin1 auf LOW
+    analogWrite(pin2, speed);     // pin2 mit PWM für Geschwindigkeit
   } else {
-    analogWrite(pin1, speed);     // pin1 = PWM
-    digitalWrite(pin2, LOW);      // pin2 = 0
+    analogWrite(pin1, speed);     // pin1 mit PWM für Geschwindigkeit
+    digitalWrite(pin2, LOW);      // pin2 auf LOW
   }
 }
 
