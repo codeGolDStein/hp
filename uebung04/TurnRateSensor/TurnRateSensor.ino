@@ -37,7 +37,7 @@ int16_t gyroOffset = 0;
 // Aufgabe 3
 //unsigned long lastMicros = 0;
 long heading_int = 0;
-// const int DEADZONE = 5;
+const int DEADZONE = 5;
 // Aufgabe 6 - Zustandsautomat Variablen
 char state = '0';  // Zustand: '0' = drive forward, '1' = rotate right
 unsigned long timer = 0;  // Timer in Millisekunden
@@ -149,7 +149,7 @@ int getHeading() {
   int16_t analogValue = analogRead(A3);
   turnRate = gyroOffset - analogValue;
   unsigned long headingTimer = millis();
-  if (!(turnRate <= 5 and turnRate >= -5)) {
+  if (!(turnRate <= DEADZONE and turnRate >= -DEADZONE)) {
     heading_int += turnRate * (headingTimer- timer);
   }
   // Aufgabe 4
