@@ -31,20 +31,18 @@ LiquidCrystal lcd(11, 12, 13, A0, A1, A2);
 
 const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTOR_B2 };
 
-/*Aufgabe 2*/
+// Aufgabe 2
 // Variable für den Ruhewert des Sensors
 int16_t gyroOffset = 0;
-
 // Aufgabe 3
 //unsigned long lastMicros = 0;
 long heading_int = 0;
-
+// const int DEADZONE = 5;
 // Aufgabe 6 - Zustandsautomat Variablen
 char state = '0';  // Zustand: '0' = drive forward, '1' = rotate right
 unsigned long timer = 0;  // Timer in Millisekunden
 int targetHeading = 0;  // Zielrichtung in Grad
 const int8_t TOLERANCE = 2;  // Toleranzbereich für heading Vergleich
-
 unsigned long timerState = 0;
 int16_t turnRate = 0;
 
@@ -70,7 +68,7 @@ void setup()
   // Warten auf Stabilisierung nach dem Einschalten
   delay(2000);
   
-  /*Aufgabe 2*/
+  // Aufgabe 2
   // Berechnung des Mittelwerts über mehrere Messungen
   long sum = 0;
   const int numSamples = 100;
@@ -82,9 +80,6 @@ void setup()
   
   gyroOffset = sum / numSamples;
   
-  // last Micros?? was das 
-  //lastMicros = micros();  // Initiale Zeit merken
-
   // Timer initialisieren
   timer = millis();
 
@@ -106,10 +101,7 @@ void loop()
   /* Aufgabe 2   */
   // Aktuellen ADC-Wert lesen
   int16_t analogValue = analogRead(A3);
-    
-  // Drehrate berechnen (aktueller Wert - Ruhewert)
-  //int16_t turnRate = analogValue - gyroOffset;
-  
+
   // ADC-Wert in erster Zeile anzeigen
   lcd.setCursor(5, 0);
   lcd.print(analogValue);
@@ -119,48 +111,79 @@ void loop()
   lcd.setCursor(11, 1);
   lcd.print(turnRate);
   lcd.print("   ");  // Überschreibt Restzeichen
-   
-  /* Aufgabe 3 */
+    
+  int heading = getHeading();
+
+  // Aufgabe 3
   /*
-  // Zeit berechnen
-  unsigned long currentMicros = micros();
-  float deltaTime = (currentMicros - lastMicros) / 1e6;  // Zeit in Sekunden
-  lastMicros = currentMicros;
+  lcd.setCursor(0, 2);  // dritte Zeile
+  lcd.print("heading: ");
+  lcd.print(heading_int);
+  lcd.print((char)223);  // Gradzeichen
+  lcd.print("   ");
   */
 
   // Aufgabe 4
-  /*  
-  const float SCALE_FACTOR = 0.71;
-  //int heading = ((int)(heading_int * SCALE_FACTOR)) % 360;
-  int heading = (int)(fmod((heading_int * SCALE_FACTOR), 360.0));
-  if (heading < 0) heading += 360;
-  */
-  
-  int heading = getHeading();
-
   lcd.setCursor(0, 2);  // dritte Zeile
   lcd.print("heading: ");
   lcd.print(heading);
   lcd.print((char)223);  // Gradzeichen
   lcd.print("   ");
 
-  
   // Aufgabe 6 - Zustandsautomat
-  
-  // do actions in state
   doState(heading);
 
   // targetHeading auf LCD anzeigen (dritte Zeile, kommentiert heading_int aus)
   lcd.setCursor(0, 3);  // 4te Zeile
   lcd.print("target: ");
   lcd.print(targetHeading);
-  lcd.print((char)223);  // deg
+  lcd.print((char)223);  
   lcd.print(" S:");
   lcd.print(state);
   lcd.print("  ");
 }
 
+// Aufgabe 3 und 4
+int getHeading() {
+  // Aufgabe 3
+  int16_t analogValue = analogRead(A3);
+  turnRate = gyroOffset - analogValue;
+  unsigned long headingTimer = millis();
+  if (!(turnRate <= 5 and turnRate >= -5)) {
+    heading_int += turnRate * (headingTimer- timer);
+  }
+  // Aufgabe 4
+  timer = headingTimer;
+  // Sklarieungsfaktor  = 2280 (wir haben einfach 
+  int heading = (heading_int / 2280) % 360;
+  if (heading < 0) {
+   heading += 360;
+  }
+  return heading;
+}
 
+// Aufgabe 5
+void setMotor(bool forward, uint8_t speed, bool motorA) {
+  int pin1, pin2;
+  
+  if (motorA) {
+    pin1 = PIN_MOTOR_A1;
+    pin2 = PIN_MOTOR_A2;
+  } else {
+    pin1 = PIN_MOTOR_B1;
+    pin2 = PIN_MOTOR_B2;
+  }
+
+  if (forward) {
+    digitalWrite(pin1, LOW);     
+    analogWrite(pin2, speed);     
+  } else {
+    analogWrite(pin1, speed);     
+    digitalWrite(pin2, LOW);      
+  }
+}
+
+// Aufgabe 6
 void doState(int heading) {
 
   // Zustandsautomat
@@ -198,51 +221,6 @@ void doState(int heading) {
       // set to current time plus 4000
       timerState = millis() + 4000;  // Set next target time
     }
-  }
-  
-
-}
-
-// berechne aktuelle drehung
-int getHeading() {
-  int16_t analogValue = analogRead(A3);
-  turnRate = gyroOffset - analogValue;
-  unsigned long headingTimer = millis();
-  if (!(turnRate <= 5 and turnRate >= -5)) {
-    heading_int += turnRate * (headingTimer- timer);
-  }
-  timer = headingTimer;
-  // Sklarieungsfaktor  = 2280
-  int heading = (heading_int / 2280) % 360;
-  if (heading < 0) {
-   heading += 360;
-  }
-   
-  return heading;
-}
-
-
-/*Aufgabe 5*/
-// setMotor: Steuert einen Motor (A oder B) mit Richtung und Geschwindigkeit
-// forward: true = vorwärts, false = rückwärts
-// motorA: true = Motor A, false = Motor B
-void setMotor(bool forward, uint8_t speed, bool motorA) {
-  int pin1, pin2;
-  
-  if (motorA) {
-    pin1 = PIN_MOTOR_A1;
-    pin2 = PIN_MOTOR_A2;
-  } else {
-    pin1 = PIN_MOTOR_B1;
-    pin2 = PIN_MOTOR_B2;
-  }
-
-  if (forward) {
-    digitalWrite(pin1, LOW);      // pin1 auf LOW
-    analogWrite(pin2, speed);     // pin2 mit PWM für Geschwindigkeit
-  } else {
-    analogWrite(pin1, speed);     // pin1 mit PWM für Geschwindigkeit
-    digitalWrite(pin2, LOW);      // pin2 auf LOW
   }
 }
 
