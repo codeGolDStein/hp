@@ -9,7 +9,7 @@ const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTO
 
 // Us pins
 #define US1_PIN 6
-#define US2_PIN 7
+#define US2_PIN 4
 #define US3_PIN 8
 
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
@@ -38,35 +38,16 @@ void setup (){
 
 void loop (){
 
-  // Measure and print distances
-  float d1 = measureDistance(US1_PIN);
-  float d2 = measureDistance(US2_PIN);
-  float d3 = measureDistance(US3_PIN);
-
-  Serial.print("US1: ");
-  Serial.print(d1);
-  Serial.print(" m, ");
-
-  Serial.print("US2: ");
-  Serial.print(d2);
-  Serial.print(" m, ");
-
-  Serial.print("US3: ");
-  Serial.print(d3);
-  Serial.println(" m");
-
-  delay(500); // Update every 500 ms
-
-  /*
   if(s1Pushed()){
 
-    // Fahre zur ersten Wand
-    while (measureDistance(US2_PIN) <= 0.6) {
+    float dist1 = 0;
+    while (dist1 <= 0.6) {
+      dist1 = measureDistance(US2_PIN);
+      Serial.println("Distance: " +  String(dist1));
       drive(true, 100, 100);
     }
-    drive(true, 0, 0);
+    
   }
-  */
 
 }
 
@@ -94,11 +75,7 @@ float measureDistance(uint8_t pin) {
   // Umrechnung von Mikrosekunden in Meter
   // Distance = (Speed of Sound × Time) / 2 x 100
   // speed of Sound = 343m/s so in mirco seconds will be 0.0343 then we get at the end (duration(which is time) x 0.0343 / 2 x 100), which equals the formula at the end
-  distance = duration * 0.0001715; 
-
-  // if(pin == 0){
-  //   Serial.println(String(pin) + " Duration: " +  String(duration));
-  // }
+  distance = duration * 0.0001715; ;
 
   return distance;
 }
