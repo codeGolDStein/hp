@@ -26,19 +26,47 @@ void setup (){
     digitalWrite(motorPins[i], LOW);
   }
 
+  // Init serial communication
+  Serial.begin(9600);
+  while (!Serial); // Optional: wait for serial if using USB-serial converter
+
+  // Init button pin
+  pinMode(BUTTON_PIN, INPUT);
+
 }
 
 
 void loop (){
 
+  // Measure and print distances
+  float d1 = measureDistance(US1_PIN);
+  float d2 = measureDistance(US2_PIN);
+  float d3 = measureDistance(US3_PIN);
+
+  Serial.print("US1: ");
+  Serial.print(d1);
+  Serial.print(" m, ");
+
+  Serial.print("US2: ");
+  Serial.print(d2);
+  Serial.print(" m, ");
+
+  Serial.print("US3: ");
+  Serial.print(d3);
+  Serial.println(" m");
+
+  delay(500); // Update every 500 ms
+
+  /*
   if(s1Pushed()){
 
     // Fahre zur ersten Wand
-    while (measureDistance(2) <= 0.6) {
+    while (measureDistance(US2_PIN) <= 0.6) {
       drive(true, 100, 100);
     }
-
+    drive(true, 0, 0);
   }
+  */
 
 }
 
