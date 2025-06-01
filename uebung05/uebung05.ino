@@ -8,10 +8,16 @@ const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_
 
 // Us pins
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 #define US1_PIN 6
 #define US2_PIN 4
 #define US3_PIN 8
 
+=======
+#define US1_PIN D8
+#define US2_PIN D7
+#define US3_PIN D3
+>>>>>>> Stashed changes
 =======
 #define US1_PIN D8
 #define US2_PIN D7
@@ -54,6 +60,10 @@ void loop (){
     
   }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
