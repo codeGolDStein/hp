@@ -1,3 +1,25 @@
+// Include WiFi libs
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include "website.h"
+
+// Add your wifi credentials here
+const char* ssid     = "KadensKerker";
+const char* password = "DippShitMidgetsshittinh88!";
+
+
+// Webserver on port 80 (standard http port)
+WiFiServer server(80);
+
+
+// Variable to store incoiming http request
+String request;
+
+
+// Name of the device (can be used as DNS query in browser)
+#define DEVICE_NAME "HWPRobo"
+
+
 // Pins of motor
 #define MOTOR_A1_PIN D1
 #define MOTOR_A2_PIN D2
@@ -10,68 +32,154 @@ const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_
 #define US1_PIN D8
 #define US2_PIN D7
 #define US3_PIN D3
-
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 
-#define BUTTON_PIN D4    // Taster S1/S2/S3... werden darüber gelesen
+bool teslaMode = false;
 
 
-void setup (){
+void setup() {
+  // Init serial
+  Serial.begin(115200);
 
   // Init motor pins as output
   for (size_t i = 0; i < sizeof(motorPins)/sizeof(motorPins[0]); i++) {
     pinMode(motorPins[i], OUTPUT);
     digitalWrite(motorPins[i], LOW);
   }
+  
+  // Comment if you want that the ESP creates an AP
+  // Connect to wifi
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  // Die IP vom Webserver auf dem seriellen Monitor ausgeben
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP Adress: ");
+  Serial.println(WiFi.localIP());
 
-  // Init serial communication
-  Serial.begin(9600);
-  while (!Serial); // Optional: wait for serial if using USB-serial converter
+  // Uncomment if you want that the ESP creates an AP
+  
+  // You can remove the password parameter if you want the AP to be open.
+  /*
+  WiFi.softAP(ssid, password);
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  */
 
-  // Init button pin
-  pinMode(BUTTON_PIN, INPUT);
+  // mDNS name resolving
+  if (MDNS.begin(DEVICE_NAME)) {
+    Serial.println("MDNS started");
+  } else {
+    Serial.println("Error starting MDNS");
+  }
 
+  // Start webserver
+  server.begin();
 }
 
 
-void loop (){
-  
-  // Measure and print distances
-  float d1 = measureDistance(US1_PIN);
-  float d2 = measureDistance(US2_PIN);
-  float d3 = measureDistance(US3_PIN);
+void loop() {
+  // Handle clients
+  handleClient();
+  // Update MDNS
+  MDNS.update();
 
-  Serial.print("US1: ");
-  Serial.print(d1);
-  Serial.print(" m, ");
+if (teslaMode) {
+    float d1 = measureDistance(US1_PIN);  // Left sensor
+    float d2 = measureDistance(US2_PIN);  // Center sensor
+    float d3 = measureDistance(US3_PIN);  // Right sensor
 
-  Serial.print("US2: ");
-  Serial.print(d2);
-  Serial.print(" m, ");
+    // Check if any sensor sees an obstacle within 30 cm
+    if ((d1 > 0 && d1 < 0.30) || 
+        (d2 > 0 && d2 < 0.30) || 
+        (d3 > 0 && d3 < 0.30)) {
 
-  Serial.print("US3: ");
-  Serial.print(d3);
-  Serial.println(" m");
-
-  delay(500); // Update every 500 ms
-
-  if(s1Pushed()){
-
-    float dist1 = 0;
-    while (dist1 <= 0.6) {
-      dist1 = measureDistance(US2_PIN);
-      Serial.println("Distance: " +  String(dist1));
-      drive(true, 100, 100);
+      turn(false, 400, 80);     // Turn right
+      delay(300);
+      drive(true, 200, 80);     // Move forward
+    } else {
+      drive(true, 200, 80);     // Clear path, go forward
     }
+  } else {
+    drive(true, 200, 0);        // Stop mode
+  }
+}
+
+
+void handleClient() {
+  // Check if a client has connected
+  WiFiClient client = server.available();
+  if (!client)  {  
+    return;  
+  }
+  // Read the first line of the request (we just need this line)
+  request = client.readStringUntil('\r');
+
+  // Print request to serial
+  Serial.print("request: ");
+  Serial.println(request); 
+
+  // print header message
+  client.println(header);
+  // Check for corresponding get message  
+  if (request.indexOf("GET /pollUS") >= 0) {
+    // Serial.println("Polling");
+    float us1 = measureDistance(US1_PIN);
+    float us2 = measureDistance(US2_PIN);
+    float us3 = measureDistance(US3_PIN);
+
+    // Send US data to website
+    client.printf("{\"US1\":%.2f, \"US2\":%.2f, \"US3\":%.2f}", us1, us2, us3);
     
+  } 
+  
+  // Insert code to make the d-pad control working
+  // Start by pressing the buttons of the d pad and watch the serial console to see how the get requests look.
+
+  else if (request.indexOf("GET /up") >= 0) {
+
+    drive(true, 300, 512);
+  }
+  else if (request.indexOf("GET /back") >= 0) {
+
+    drive(false, 300, 512);
+  }
+  else if (request.indexOf("GET /left") >= 0) {
+
+    turn(false, 300, 512);
+  }
+  else if (request.indexOf("GET /right") >= 0) {
+
+    turn(true, 300, 512);
+  }
+
+  else if (request.indexOf("GET /tesla") >= 0) {
+  teslaMode = !teslaMode;
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-Type: text/plain");
+  client.println();
+  client.println(teslaMode ? "Tesla ON" : "Tesla OFF");
+
+  // Serve initial Website
+  } else {
+    // Finish HTTP-Request with a newline (thats cruical)
+    client.flush();
+    client.println(page);
+    client.println();
   }
 }
 
 
 float measureDistance(uint8_t pin) {
   long duration;
-  float distance;
+  float   distance;
 
   // Trigger-Puls senden
   pinMode(pin, OUTPUT);
@@ -92,10 +200,15 @@ float measureDistance(uint8_t pin) {
   // Umrechnung von Mikrosekunden in Meter
   // Distance = (Speed of Sound × Time) / 2 x 100
   // speed of Sound = 343m/s so in mirco seconds will be 0.0343 then we get at the end (duration(which is time) x 0.0343 / 2 x 100), which equals the formula at the end
-  distance = duration * 0.0001715; ;
+  distance = duration * 0.0001715; 
+
+  // if(pin == 0){
+  //   Serial.println(String(pin) + " Duration: " +  String(duration));
+  // }
 
   return distance;
 }
+
 
 void turn(bool left, uint16_t time, uint16_t speed) {
   setMotor(left, speed, true);   // Motor A
@@ -139,15 +252,5 @@ void setMotor(bool forward, uint16_t speed, bool motorA) {
   } else {
     analogWrite(Motor1, speed);
     analogWrite(Motor2, speedReverse);
-  }
-}
-
-bool s1Pushed() {
-  int a1_value = analogRead(BUTTON_PIN);
-  String currentButton = "";
-  if (a1_value >= 0 && a1_value <= 100) {
-    return true;
-  } else {
-    return false;
   }
 }
