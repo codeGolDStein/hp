@@ -36,15 +36,25 @@ void setup (){
 
 
 void loop (){
-  float d1 = measureDistance(US1_TRIG, US1_ECHO);
-  float d2 = measureDistance(US2_TRIG, US2_ECHO);
-  float d3 = measureDistance(US3_TRIG, US3_ECHO);
+  
+  // Measure and print distances
+  float d1 = measureDistance(US1_PIN);
+  float d2 = measureDistance(US2_PIN);
+  float d3 = measureDistance(US3_PIN);
 
-  Serial.print("US1: "); Serial.print(d1); Serial.print(" m, ");
-  Serial.print("US2: "); Serial.print(d2); Serial.print(" m, ");
-  Serial.print("US3: "); Serial.print(d3); Serial.println(" m");
+  Serial.print("US1: ");
+  Serial.print(d1);
+  Serial.print(" m, ");
 
-  delay(500);
+  Serial.print("US2: ");
+  Serial.print(d2);
+  Serial.print(" m, ");
+
+  Serial.print("US3: ");
+  Serial.print(d3);
+  Serial.println(" m");
+
+  delay(500); // Update every 500 ms
 
   if(s1Pushed()){
 
