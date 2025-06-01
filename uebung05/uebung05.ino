@@ -1,8 +1,8 @@
 // Pins of motor
-#define PIN_MOTOR_A1 2
-#define PIN_MOTOR_A2 3
-#define PIN_MOTOR_B1 4
-#define PIN_MOTOR_B2 5
+#define PIN_MOTOR_A1 5
+#define PIN_MOTOR_A2 6
+#define PIN_MOTOR_B1 9
+#define PIN_MOTOR_B2 10
 
 const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTOR_B2 };
 
@@ -35,10 +35,9 @@ void loop (){
 
     // Fahre zur ersten Wand
 
-    drive(true, 200, 80);
+    drive(true, 200, 100);
 
     // Überprüfung ob wand erkannt wird
-
   }
 
 }
