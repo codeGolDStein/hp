@@ -7,22 +7,10 @@ const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_
 
 
 // Us pins
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-#define US1_PIN 6
-#define US2_PIN 4
-#define US3_PIN 8
+#define US1_PIN D8
+#define US2_PIN D7
+#define US3_PIN D3
 
-=======
-#define US1_PIN D8
-#define US2_PIN D7
-#define US3_PIN D3
->>>>>>> Stashed changes
-=======
-#define US1_PIN D8
-#define US2_PIN D7
-#define US3_PIN D3
->>>>>>> Stashed changes
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 
@@ -48,6 +36,15 @@ void setup (){
 
 
 void loop (){
+  float d1 = measureDistance(US1_TRIG, US1_ECHO);
+  float d2 = measureDistance(US2_TRIG, US2_ECHO);
+  float d3 = measureDistance(US3_TRIG, US3_ECHO);
+
+  Serial.print("US1: "); Serial.print(d1); Serial.print(" m, ");
+  Serial.print("US2: "); Serial.print(d2); Serial.print(" m, ");
+  Serial.print("US3: "); Serial.print(d3); Serial.println(" m");
+
+  delay(500);
 
   if(s1Pushed()){
 
@@ -59,15 +56,6 @@ void loop (){
     }
     
   }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
-
 }
 
 
