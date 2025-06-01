@@ -4,7 +4,7 @@
 #include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "KadensKerker";
+const char* ssid     = "i";
 const char* password = "DippShitMidgetsshittinh88!";
 
 
