@@ -34,10 +34,10 @@ void loop (){
   if(s1Pushed()){
 
     // Fahre zur ersten Wand
+    while (measureDistance(2) <= 0.6) {
+      drive(true, 100, 100);
+    }
 
-    drive(true, 200, 100);
-
-    // Überprüfung ob wand erkannt wird
   }
 
 }
