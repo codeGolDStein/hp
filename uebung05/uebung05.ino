@@ -15,6 +15,9 @@ const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTO
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 
+#define BUTTON_PIN A1       // Taster S1/S2/S3... werden darüber gelesen
+
+
 void setup (){
 
   // Init motor pins as output
@@ -27,6 +30,10 @@ void setup (){
 
 
 void loop (){
+
+  if(s1Pushed()){
+    // Fange an zu fahren
+  }
 
 }
 
@@ -105,5 +112,23 @@ void setMotor(bool forward, uint16_t speed, bool motorA) {
   } else {
     analogWrite(Motor1, speed);
     analogWrite(Motor2, speedReverse);
+  }
+}
+
+bool s1Pushed() {
+  int a1_value = analogRead(BUTTON_PIN);
+  String currentButton = "";
+  if (a1_value >= 0 && a1_value <= 100) {
+    return true;
+  } else if (a1_value >= 101 && a1_value <= 200) {
+    return false;
+  } else if (a1_value >= 300 && a1_value <= 400) {
+    return false;
+  } else if (a1_value >= 401 && a1_value <= 500) {
+    return false;
+  } else if (a1_value >= 501 && a1_value <= 600) {
+    return false;
+  } else {
+    return false;
   }
 }
