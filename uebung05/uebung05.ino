@@ -1,21 +1,26 @@
 // Pins of motor
-#define PIN_MOTOR_A1 5
-#define PIN_MOTOR_A2 6
-#define PIN_MOTOR_B1 9
-#define PIN_MOTOR_B2 10
-
-const uint8_t motorPins[] = { PIN_MOTOR_A1, PIN_MOTOR_A2, PIN_MOTOR_B1, PIN_MOTOR_B2 };
+#define MOTOR_A1_PIN D1
+#define MOTOR_A2_PIN D2
+#define MOTOR_B1_PIN D5
+#define MOTOR_B2_PIN D6
+const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_PIN};
 
 
 // Us pins
+<<<<<<< Updated upstream
 #define US1_PIN 6
 #define US2_PIN 4
 #define US3_PIN 8
 
+=======
+#define US1_PIN D8
+#define US2_PIN D7
+#define US3_PIN D3
+>>>>>>> Stashed changes
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 
-#define BUTTON_PIN A1    // Taster S1/S2/S3... werden darüber gelesen
+#define BUTTON_PIN D4    // Taster S1/S2/S3... werden darüber gelesen
 
 
 void setup (){
@@ -48,6 +53,10 @@ void loop (){
     }
     
   }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
 }
 
@@ -105,13 +114,13 @@ void drive(bool forward, uint16_t time, uint16_t speed) {
 
 
 void setMotor(bool forward, uint16_t speed, bool motorA) {
-  int8_t Motor1 = PIN_MOTOR_A1;
-  int8_t Motor2 = PIN_MOTOR_A2;
+  int8_t Motor1 = MOTOR_A1_PIN;
+  int8_t Motor2 = MOTOR_A2_PIN;
   uint16_t speedReverse = 0;
 
   if (!motorA){
-    Motor1 = PIN_MOTOR_B1;
-    Motor2 = PIN_MOTOR_B2;
+    Motor1 = MOTOR_B1_PIN;
+    Motor2 = MOTOR_B2_PIN;
     speedReverse = speed;
     speed = 0;
   }
