@@ -4,8 +4,8 @@
 #include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "i";
-const char* password = "DippShitMidgetsshittinh88!";
+const char* ssid     = "iPhone Alex";
+const char* password = "hpistgeil";
 
 
 // Webserver on port 80 (standard http port)
