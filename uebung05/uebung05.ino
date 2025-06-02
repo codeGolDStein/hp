@@ -96,10 +96,10 @@ if (teslaMode) {
     float d2 = measureDistance(US2_PIN);  // Center sensor
     float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    // Check if any sensor sees an obstacle within 30 cm
-    if ((d1 > 0 && d1 < 0.30) || 
-        (d2 > 0 && d2 < 0.30) || 
-        (d3 > 0 && d3 < 0.30)) {
+    // Check if any sensor sees an obstacle within 60 cm
+    if ((d1 > 0 && d1 < 0.60) || 
+        (d2 > 0 && d2 < 0.60) || 
+        (d3 > 0 && d3 < 0.60)) {
 
       turn(false, 400, 80);     // Turn right
       delay(300);
@@ -140,27 +140,7 @@ void handleClient() {
     
   } 
   
-  // Insert code to make the d-pad control working
-  // Start by pressing the buttons of the d pad and watch the serial console to see how the get requests look.
-
-  else if (request.indexOf("GET /up") >= 0) {
-
-    drive(true, 300, 512);
-  }
-  else if (request.indexOf("GET /back") >= 0) {
-
-    drive(false, 300, 512);
-  }
-  else if (request.indexOf("GET /left") >= 0) {
-
-    turn(false, 300, 512);
-  }
-  else if (request.indexOf("GET /right") >= 0) {
-
-    turn(true, 300, 512);
-  }
-
-  else if (request.indexOf("GET /tesla") >= 0) {
+  if (request.indexOf("GET /tesla") >= 0) {
   teslaMode = !teslaMode;
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/plain");
