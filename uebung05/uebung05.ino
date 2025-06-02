@@ -36,7 +36,8 @@ const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 
 bool teslaMode = false;
-int state = 0;
+int step = 0;
+bool run = true;
 
 
 void setup() {
@@ -97,26 +98,24 @@ if (teslaMode) {
     float d2 = measureDistance(US2_PIN);  // Center sensor
     float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    doTask(true);  
+    doTask(true, d2);  
+}
 }
 
 
-void doTask(bool run){
+void doTask(bool run, float d2) {
   // if finished quit
-  if (!run || finished) {
+  if (!run) {
     return;
   }
   
-
   switch(step) {
     case 0:
       // Step 1: Drive straight until distance is 60cm or less
       drive(true, 100, 150); // Drive forward for 100ms at speed 150
       
-      // Check distance (convert from duration to approximate cm)
       // Based on your calibration: 5cm = 447, so ~89.4 duration per cm
-      float dist = measureDistance(S2_PIN);
-      if (dist > 0 && dist <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
+      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
         step = 1; // Move to next step
       }
       break;
@@ -132,8 +131,7 @@ void doTask(bool run){
       // Step 2: Drive straight until distance is 60cm or less
       drive(true, 100, 150);
       
-      dist = measureDistance(S2_PIN);
-      if (dist > 0 && dist <= 0.60) { // ~60cm threshold
+      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
         step = 3;
       }
       break;
@@ -149,8 +147,7 @@ void doTask(bool run){
       // Step 3: Drive straight until distance is 60cm or less
       drive(true, 100, 150);
       
-      dist = measureDistance(S2_PIN);
-      if (dist > 0 && dist <= 0.60) { // ~60cm threshold
+      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
         step = 5;
       }
       break;
@@ -159,13 +156,11 @@ void doTask(bool run){
       // Final turn left
       turn(true, 500, 150);
       delay(200);
-      finished = true; // Mark sequence as complete
+      run = false; // Mark sequence as complete
       step = 0; // Reset for potential future runs
       break;
   }
 }
-
-
 
 
 
