@@ -174,18 +174,6 @@ const char page[] = R"=====(
 </script>
 <body>
     <div class="headline">Hardware Praktikum SS25</div>
-    <div class="container">
-        <div class="directional-buttons">
-            <button class="direction-button up" id='up' onclick='gamepad(this)'>
-            </button>
-            <button class="direction-button left" id='left' onclick='gamepad(this)'>
-            </button>
-            <button class="direction-button right" id='right' onclick='gamepad(this)'>
-            </button>
-            <button class="direction-button down" id='back' onclick='gamepad(this)'>
-            </button>
-        </div>
-    </div>
 
     <div class="container" style="margin-top: 30px;">
     <button id="tesla" onclick="gamepad(this)" style="font-size: x-large; padding: 1em; border-radius: 10px;">
