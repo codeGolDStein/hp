@@ -36,6 +36,7 @@ const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
 
 bool teslaMode = false;
+int state = 0;
 
 
 void setup() {
@@ -96,21 +97,77 @@ if (teslaMode) {
     float d2 = measureDistance(US2_PIN);  // Center sensor
     float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    // Check if any sensor sees an obstacle within 60 cm
-    if ((d1 > 0 && d1 < 0.60) || 
-        (d2 > 0 && d2 < 0.60) || 
-        (d3 > 0 && d3 < 0.60)) {
+    doTask(true);  
+}
 
-      turn(false, 400, 80);     // Turn right
-      delay(300);
-      drive(true, 200, 80);     // Move forward
-    } else {
-      drive(true, 200, 80);     // Clear path, go forward
-    }
-  } else {
-    drive(true, 200, 0);        // Stop mode
+
+void doTask(bool run){
+  // if finished quit
+  if (!run || finished) {
+    return;
+  }
+  
+
+  switch(step) {
+    case 0:
+      // Step 1: Drive straight until distance is 60cm or less
+      drive(true, 100, 150); // Drive forward for 100ms at speed 150
+      
+      // Check distance (convert from duration to approximate cm)
+      // Based on your calibration: 5cm = 447, so ~89.4 duration per cm
+      float dist = measureDistance(S2_PIN);
+      if (dist > 0 && dist <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
+        step = 1; // Move to next step
+      }
+      break;
+      
+    case 1:
+      // Turn right
+      turn(false, 500, 150); // Turn right for 500ms at speed 150
+      delay(200); // Brief pause after turn
+      step = 2;
+      break;
+      
+    case 2:
+      // Step 2: Drive straight until distance is 60cm or less
+      drive(true, 100, 150);
+      
+      dist = measureDistance(S2_PIN);
+      if (dist > 0 && dist <= 0.60) { // ~60cm threshold
+        step = 3;
+      }
+      break;
+      
+    case 3:
+      // Turn left
+      turn(true, 500, 150); // Turn left for 500ms at speed 150
+      delay(200);
+      step = 4;
+      break;
+      
+    case 4:
+      // Step 3: Drive straight until distance is 60cm or less
+      drive(true, 100, 150);
+      
+      dist = measureDistance(S2_PIN);
+      if (dist > 0 && dist <= 0.60) { // ~60cm threshold
+        step = 5;
+      }
+      break;
+      
+    case 5:
+      // Final turn left
+      turn(true, 500, 150);
+      delay(200);
+      finished = true; // Mark sequence as complete
+      step = 0; // Reset for potential future runs
+      break;
   }
 }
+
+
+
+
 
 
 void handleClient() {
