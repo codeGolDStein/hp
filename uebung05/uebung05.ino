@@ -158,7 +158,7 @@ void doTask(bool run, float d2) {
       delay(200);
       run = false; // Mark sequence as complete
       step = 10; // Reset for potential future runs
-      teslamode = false;
+      teslaMode = false;
       break;
 
     case 10:
