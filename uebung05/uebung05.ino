@@ -98,7 +98,10 @@ if (teslaMode) {
     float d2 = measureDistance(US2_PIN);  // Center sensor
     float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    doTask(true, d2);  
+    doTask(true, d2);
+
+    drive(true, 100, 150); // Drive forward for 100ms at speed 150
+
 }
 }
 
@@ -112,7 +115,6 @@ void doTask(bool run, float d2) {
   switch(step) {
     case 0:
       // Step 1: Drive straight until distance is 60cm or less
-      drive(true, 100, 150); // Drive forward for 100ms at speed 150
       
       // Based on your calibration: 5cm = 447, so ~89.4 duration per cm
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
@@ -144,9 +146,7 @@ void doTask(bool run, float d2) {
       break;
       
     case 4:
-      // Step 3: Drive straight until distance is 60cm or less
-      drive(true, 100, 150);
-      
+      // Step 3: Drive straight until distance is 60cm or less      
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
         step = 5;
       }
@@ -157,8 +157,12 @@ void doTask(bool run, float d2) {
       turn(true, 500, 150);
       delay(200);
       run = false; // Mark sequence as complete
-      step = 0; // Reset for potential future runs
+      step = 10; // Reset for potential future runs
+      teslamode = false;
       break;
+
+    case 10:
+      break;  
   }
 }
 
