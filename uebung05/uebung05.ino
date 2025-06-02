@@ -12,7 +12,7 @@ const int8_t S3_PIN = D3;
 
 // Abbiege Rheinfolge erreicht
 bool finished = false;
-int state = 0;
+int step = 0;
 
 
 // 5cm = 447 duration 
