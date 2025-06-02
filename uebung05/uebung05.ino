@@ -116,7 +116,6 @@ void doTask(bool run, float d2) {
     case 0:
       // Step 1: Drive straight until distance is 60cm or less
       
-      // Based on your calibration: 5cm = 447, so ~89.4 duration per cm
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
         step = 1; // Move to next step
       }
@@ -130,9 +129,6 @@ void doTask(bool run, float d2) {
       break;
       
     case 2:
-      // Step 2: Drive straight until distance is 60cm or less
-      drive(true, 100, 150);
-      
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
         step = 3;
       }
@@ -146,7 +142,6 @@ void doTask(bool run, float d2) {
       break;
       
     case 4:
-      // Step 3: Drive straight until distance is 60cm or less      
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
         step = 5;
       }
@@ -157,12 +152,11 @@ void doTask(bool run, float d2) {
       turn(true, 500, 150);
       delay(200);
       run = false; // Mark sequence as complete
-      step = 10; // Reset for potential future runs
       teslaMode = false;
       break;
 
-    case 10:
-      break;  
+    case _:
+      break;
   }
 }
 
