@@ -84,6 +84,7 @@ void setup() {
 
   // Start webserver
   server.begin();
+  
 }
 
 
@@ -93,12 +94,19 @@ void loop() {
   // Update MDNS
   MDNS.update();
 
+  float d2 = measureDistance(US2_PIN);  // Center sensor
+
+  Serial.print("Center distance (d2): ");
+  Serial.print(d2);
+  Serial.println(" cm");
+
+
 if (teslaMode) {
     float d1 = measureDistance(US1_PIN);  // Left sensor
     float d2 = measureDistance(US2_PIN);  // Center sensor
     float d3 = measureDistance(US3_PIN);  // Right sensor
 
-    doTask(true, d2);
+    doTask(d2);
 
     drive(true, 100, 150); // Drive forward for 100ms at speed 150
 
@@ -106,7 +114,7 @@ if (teslaMode) {
 }
 
 
-void doTask(bool run, float d2) {
+void doTask(float d2) {
   // if finished quit
   if (!run) {
     return;
@@ -115,32 +123,32 @@ void doTask(bool run, float d2) {
   switch(step) {
     case 0:
       // Step 1: Drive straight until distance is 60cm --> then turn right
-      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
-        turn(false, 500, 150); // Turn right for 500ms at speed 150
+      if (d2 > 0 && d2 <= 60) { // ~60cm threshold (60 * 89.4 ≈ 535)
+        turn(true, 500, 150); // Turn right for 500ms at speed 150
         delay(200);
         step = 1; // Move to next step
       }
       break;
     case 1:
       // Step 2: Drive straight until distance is 60cm --> then turn Leftf
-      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
-        turn(true, 500, 150); // Turn left for 500ms at speed 150
+      if (d2 > 0 && d2 <= 60) { // ~60cm threshold
+        turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200); // Brief pause after turn
         step = 2;
       }
       break;
     case 3:
       // Step 3: Drive straight until distance is 60cm --> then turn Left
-      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
-        turn(true, 500, 150); // Turn left for 500ms at speed 150
+      if (d2 > 0 && d2 <= 60) { // ~60cm threshold
+        turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200);
-        step = 4
+        step = 4;
       }
       break;
     case 4:
-      if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
+      if (d2 > 0 && d2 <= 60) { // ~60cm threshold
         // Final turn left
-        turn(true, 500, 150);
+        turn(false, 500, 0); // Turn left for 500ms at speed 150
         delay(200);
         run = false; // Mark sequence as complete
         step = 0;
@@ -197,40 +205,37 @@ void handleClient() {
 }
 
 
-float measureDistance(uint8_t pin) {
-  long duration;
-  float   distance;
-
-  // Trigger-Puls senden
-  pinMode(pin, OUTPUT);
-  digitalWrite(pin, LOW);
-  delayMicroseconds(5);
-  digitalWrite(pin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(pin, LOW);
-
-  // Pin auf Input stellen, um Echo zu empfangen
-  pinMode(pin, INPUT);
-  duration = pulseIn(pin, HIGH, 30000);  // Timeout nach 30 ms
-
-  if (duration == 0) {
-    return -1.0;  // Kein Hindernis erkannt
+float measureDistance(int sensor)
+{
+  unsigned long int t;
+  // Start sensor
+  pinMode(sensor, OUTPUT);
+  digitalWrite(sensor, LOW);
+  delay(2);
+  digitalWrite(sensor, HIGH);
+  delay(2);  
+  digitalWrite(sensor, LOW);
+  
+  // read sensor
+  pinMode(sensor, INPUT);
+  while(digitalRead(sensor) == LOW) {};
+  
+  t = micros();
+  while(micros() - t < 30000)
+  {
+    if(digitalRead(sensor) == LOW)
+    {
+      return (micros() - t) / 58.;
+    }
   }
-
-  // Umrechnung von Mikrosekunden in Meter
-  // Distance = (Speed of Sound × Time) / 2 x 100
-  // speed of Sound = 343m/s so in mirco seconds will be 0.0343 then we get at the end (duration(which is time) x 0.0343 / 2 x 100), which equals the formula at the end
-  distance = duration * 0.0001715; 
-
-  // if(pin == 0){
-  //   Serial.println(String(pin) + " Duration: " +  String(duration));
-  // }
-
-  return distance;
+  
+  return -1;
 }
 
 
-void turn(bool left, uint16_t time, uint16_t speed) {
+void drive(bool left, uint16_t time, uint16_t speed) {
+  left = !left;
+
   setMotor(left, speed, true);   // Motor A
   setMotor(!left, speed, false);  // Motor B
 
@@ -242,7 +247,9 @@ void turn(bool left, uint16_t time, uint16_t speed) {
 }
 
 
-void drive(bool forward, uint16_t time, uint16_t speed) {
+void turn(bool forward, uint16_t time, uint16_t speed) {
+  forward = !forward;
+
   setMotor(forward, speed, true);   // Motor A
   setMotor(forward, speed, false);  // Motor B
 
