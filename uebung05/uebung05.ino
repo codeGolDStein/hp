@@ -159,8 +159,6 @@ void doTask(float d2) {
 }
 
 
-
-
 void handleClient() {
   // Check if a client has connected
   WiFiClient client = server.available();
@@ -237,13 +235,14 @@ void drive(bool left, uint16_t time, uint16_t speed) {
   left = !left;
 
   setMotor(left, speed, true);   // Motor A
-  setMotor(!left, speed, false);  // Motor B
+  setMotor(left, speed, false);  // Motor B
 
   delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
+  
 }
 
 
@@ -251,13 +250,14 @@ void turn(bool forward, uint16_t time, uint16_t speed) {
   forward = !forward;
 
   setMotor(forward, speed, true);   // Motor A
-  setMotor(forward, speed, false);  // Motor B
+  setMotor(!forward, speed, false);  // Motor B
 
   delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
+
 }
 
 
