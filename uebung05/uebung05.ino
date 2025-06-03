@@ -124,6 +124,7 @@ void doTask(float d2) {
     case 0:
       // Step 1: Drive straight until distance is 60cm --> then turn right
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold (60 * 89.4 ≈ 535)
+        delay(200);
         turn(true, 500, 150); // Turn right for 500ms at speed 150
         delay(200);
         step = 1; // Move to next step
@@ -132,6 +133,7 @@ void doTask(float d2) {
     case 1:
       // Step 2: Drive straight until distance is 60cm --> then turn Leftf
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
+        delay(200);
         turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200); // Brief pause after turn
         step = 2;
@@ -140,6 +142,7 @@ void doTask(float d2) {
     case 2:
       // Step 3: Drive straight until distance is 60cm --> then turn Left
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
+        delay(200);
         turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200);
         step = 3;
@@ -148,6 +151,7 @@ void doTask(float d2) {
     case 3:
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
         // Final turn left
+        delay(200);
         turn(false, 500, 0); // Turn left for 500ms at speed 150
         delay(200);
         run = false; // Mark sequence as complete
