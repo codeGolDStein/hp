@@ -116,7 +116,8 @@ void doTask(bool run, float d2) {
     case 0:
       // Step 1: Drive straight until distance is 60cm --> then turn right
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold (60 * 89.4 ≈ 535)
-        turn(false, 500, 150); // Turn right for 500ms at speed 150
+        delay(50);
+        turn(true, 500, 150); // Turn right for 500ms at speed 150
         delay(200);
         step = 1; // Move to next step
       }
@@ -124,7 +125,8 @@ void doTask(bool run, float d2) {
     case 1:
       // Step 2: Drive straight until distance is 60cm --> then turn Leftf
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
-        turn(true, 500, 150); // Turn left for 500ms at speed 150
+        delay(50);
+        turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200); // Brief pause after turn
         step = 2;
       }
@@ -132,13 +134,15 @@ void doTask(bool run, float d2) {
     case 3:
       // Step 3: Drive straight until distance is 60cm --> then turn Left
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
-        turn(true, 500, 150); // Turn left for 500ms at speed 150
+        delay(50);
+        turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200);
         step = 4
       }
       break;
     case 4:
       if (d2 > 0 && d2 <= 0.60) { // ~60cm threshold
+        delay(50);
         // Final turn left
         turn(true, 500, 150);
         delay(200);
@@ -149,8 +153,6 @@ void doTask(bool run, float d2) {
       break;
   }
 }
-
-
 
 
 void handleClient() {
@@ -230,27 +232,36 @@ float measureDistance(uint8_t pin) {
 }
 
 
-void turn(bool left, uint16_t time, uint16_t speed) {
+void drive(bool left, uint16_t time, uint16_t speed) {
+  left = !left;
+
+
   setMotor(left, speed, true);   // Motor A
-  setMotor(!left, speed, false);  // Motor B
+  setMotor(left, speed, false);  // Motor B
 
   delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
+  
 }
 
 
-void drive(bool forward, uint16_t time, uint16_t speed) {
+void turn(bool forward, uint16_t time, uint16_t speed) {
+  
+  //-------
+  forward = !forward;
+
   setMotor(forward, speed, true);   // Motor A
-  setMotor(forward, speed, false);  // Motor B
+  setMotor(!forward, speed, false);  // Motor B
 
   delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
+
 }
 
 
