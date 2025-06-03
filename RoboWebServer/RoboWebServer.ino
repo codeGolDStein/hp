@@ -1,12 +1,11 @@
 // Include WiFi libs
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#inc
-lude "website.h"
+#include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "KadensKerker";
-const char* password = "DippShitMidgetsshittinh88!";
+const char* ssid     = "iPhone Alex";
+const char* password = "hpistgeil";
 
 
 // Webserver on port 80 (standard http port)
@@ -91,6 +90,12 @@ void loop() {
   handleClient();
   // Update MDNS
   MDNS.update();
+
+  // Motor A forward
+  //void setMotor(bool forward, uint16_t speed, bool motorA) {
+ 
+
+
 
 if (teslaMode) {
     float d1 = measureDistance(US1_PIN);  // Left sensor
@@ -211,7 +216,9 @@ float measureDistance(uint8_t pin) {
 }
 
 
-void turn(bool left, uint16_t time, uint16_t speed) {
+void drive(bool left, uint16_t time, uint16_t speed) {
+  left = !left;
+
   setMotor(left, speed, true);   // Motor A
   setMotor(!left, speed, false);  // Motor B
 
@@ -223,7 +230,9 @@ void turn(bool left, uint16_t time, uint16_t speed) {
 }
 
 
-void drive(bool forward, uint16_t time, uint16_t speed) {
+void turn(bool forward, uint16_t time, uint16_t speed) {
+  forward = !forward;
+
   setMotor(forward, speed, true);   // Motor A
   setMotor(forward, speed, false);  // Motor B
 
