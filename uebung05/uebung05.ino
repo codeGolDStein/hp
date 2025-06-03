@@ -137,15 +137,15 @@ void doTask(float d2) {
         step = 2;
       }
       break;
-    case 3:
+    case 2:
       // Step 3: Drive straight until distance is 60cm --> then turn Left
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
         turn(false, 500, 150); // Turn left for 500ms at speed 150
         delay(200);
-        step = 4;
+        step = 3;
       }
       break;
-    case 4:
+    case 3:
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
         // Final turn left
         turn(false, 500, 0); // Turn left for 500ms at speed 150
@@ -235,14 +235,13 @@ void drive(bool left, uint16_t time, uint16_t speed) {
   left = !left;
 
   setMotor(left, speed, true);   // Motor A
-  setMotor(left, speed, false);  // Motor B
+  setMotor(!left, speed, false);  // Motor B
 
   delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
-  
 }
 
 
@@ -250,14 +249,13 @@ void turn(bool forward, uint16_t time, uint16_t speed) {
   forward = !forward;
 
   setMotor(forward, speed, true);   // Motor A
-  setMotor(!forward, speed, false);  // Motor B
+  setMotor(forward, speed, false);  // Motor B
 
   delay(time);
 
   // Stop both motors
   setMotor(true, 0, true);
   setMotor(true, 0, false);
-
 }
 
 
