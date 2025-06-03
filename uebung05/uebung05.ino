@@ -152,6 +152,7 @@ void doTask(bool run, float d2) {
       turn(true, 500, 150);
       delay(200);
       run = false; // Mark sequence as complete
+      step = 0;
       teslaMode = false;
       break;
 
