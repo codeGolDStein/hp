@@ -4,8 +4,8 @@
 #include "website.h"
 
 // Add your wifi credentials here
-const char* ssid     = "iPhone Alex";
-const char* password = "hpistgeil";
+const char* ssid     = "Kaden";
+const char* password = "neinomar";
 
 
 // Webserver on port 80 (standard http port)
@@ -34,7 +34,6 @@ const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_
 #define US3_PIN D3
 const uint8_t usPins[] = {US1_PIN, US2_PIN, US3_PIN};
 
-
 bool teslaMode = false;
 int step = 0;
 bool run = true;
@@ -49,7 +48,7 @@ void setup() {
     pinMode(motorPins[i], OUTPUT);
     digitalWrite(motorPins[i], LOW);
   }
-  
+
   // Comment if you want that the ESP creates an AP
   // Connect to wifi
   Serial.print("Connecting to ");
@@ -124,32 +123,28 @@ void doTask(float d2) {
     case 0:
       // Step 1: Drive straight until distance is 60cm --> then turn right
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold (60 * 89.4 ≈ 535)
-        delay(200);
-        turn(true, 500, 150); // Turn right for 500ms at speed 150
+        turn(true, 480, 150); // Turn right for 500ms at speed 150
         step = 1; // Move to next step
       }
       break;
     case 1:
       // Step 2: Drive straight until distance is 60cm --> then turn Leftf
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
-        delay(200);
-        turn(false, 500, 150); // Turn left for 500ms at speed 150
+        turn(false, 480, 150); // Turn left for 500ms at speed 150
         step = 2;
       }
       break;
     case 2:
       // Step 3: Drive straight until distance is 60cm --> then turn Left
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
-        delay(200);
-        turn(false, 500, 150); // Turn left for 500ms at speed 150
+        turn(false, 480, 150); // Turn left for 500ms at speed 150
         step = 3;
       }
       break;
     case 3:
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
         // Final turn left
-        delay(200);
-        turn(false, 500, 0); // Turn left for 500ms at speed 150
+        turn(false, 480, 0); // Turn left for 500ms at speed 150
         run = false; // Mark sequence as complete
         step = 0;
         teslaMode = false;
