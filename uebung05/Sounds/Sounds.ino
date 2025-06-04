@@ -54,13 +54,10 @@ void setup() {
   
   /*Aufgabe 5*/
   // Initialisiere die serielle Schnittstelle mit 38400 Baud
-  Serial.begin(115200);
-  Serial.println("System gestartet");
-  
-  // RTTTL parsen
-  Serial.println("Starte RTTTL-Parser");
+  Serial.begin(9600);
+
   parseRTTTL(buffer);
-  Serial.println("RTTTL-Parser beendet");
+
   
   // Melody abspielen
   //playMelody();
@@ -77,16 +74,10 @@ void loop() {
   
   // Gib einmal pro Sekunde den aktuellen Timer-Zähler aus
   if (tCount - lastPrintTime >= 1000) {
-    Serial.print("Timer Counter: ");
-    Serial.println(tCount);
-    Serial.print("Note: ");
-    Serial.print(melodyIdx);
+
     if (melodyIdx < melodyLen) {
-      Serial.print(" (");
-      Serial.print(notes[melodyIdx]);
-      Serial.println(" Hz)");
+
     } else {
-      Serial.println(" (Melodie beendet)");
     }
     lastPrintTime = tCount;
   }
@@ -131,7 +122,7 @@ void parseRTTTL(const char* rtttl) {
     idx++;
   } else {
     // Ungültiges Format
-    Serial.println("Fehler: RTTTL ohne ':'");
+
     return;
   }
   
@@ -145,18 +136,15 @@ void parseRTTTL(const char* rtttl) {
     if (rtttl[idx] == 'd' && rtttl[idx+1] == '=') {
       idx += 2;
       defaultDuration = str2uint(rtttl, &idx);
-      Serial.print("Default Duration: ");
-      Serial.println(defaultDuration);
+
     } else if (rtttl[idx] == 'o' && rtttl[idx+1] == '=') {
       idx += 2;
       defaultOctave = str2uint(rtttl, &idx);
-      Serial.print("Default Octave: ");
-      Serial.println(defaultOctave);
+
     } else if (rtttl[idx] == 'b' && rtttl[idx+1] == '=') {
       idx += 2;
       bpm = str2uint(rtttl, &idx);
-      Serial.print("BPM: ");
-      Serial.println(bpm);
+
     }
     
     // Zum nächsten Parameter oder Ende der Parameter gehen
@@ -170,8 +158,7 @@ void parseRTTTL(const char* rtttl) {
   
   // Berechnen der Basisdauer einer Viertelnote in ms
   uint16_t quarterNoteDuration = 60 * 1000 / bpm;
-  Serial.print("Quarter note duration (ms): ");
-  Serial.println(quarterNoteDuration);
+
   
   // Parsen der einzelnen Noten
   while (rtttl[idx] != '\0' && noteIndex < MAX_NOTES) {
@@ -200,8 +187,6 @@ void parseRTTTL(const char* rtttl) {
       case 'b': case 'h': note = 11; break;
       case 'p': isPause = true; break;
       default: 
-        Serial.print("Ungültige Note: ");
-        Serial.println(rtttl[idx]);
         break;
     }
     idx++;
@@ -252,14 +237,6 @@ void parseRTTTL(const char* rtttl) {
     notes[noteIndex] = frequency;
     durations[noteIndex] = noteDuration;
     
-    // Debug-Ausgabe
-    Serial.print("Note ");
-    Serial.print(noteIndex);
-    Serial.print(": Freq=");
-    Serial.print(frequency);
-    Serial.print(" Hz, Dur=");
-    Serial.print(noteDuration);
-    Serial.println(" ms");
     
     noteIndex++;
     
@@ -273,9 +250,7 @@ void parseRTTTL(const char* rtttl) {
   
   // Gesamtlänge der Melodie speichern
   melodyLen = noteIndex;
-  Serial.print("Melodie mit ");
-  Serial.print(melodyLen);
-  Serial.println(" Noten geparst");
+
 }
 
 /* Aufgabe 1 */
@@ -369,7 +344,6 @@ void playMelody() {
   tCount = 0;
   setTimer1Freq(notes[melodyIdx]);
   setTimer2(true);  // 1ms-Timer aktivieren
-  Serial.println("Melodie gestartet");
 }
 
 /*Aufgabe 5*/
