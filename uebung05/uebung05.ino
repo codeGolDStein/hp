@@ -11,14 +11,11 @@ const char* password = "neinomar";
 // Webserver on port 80 (standard http port)
 WiFiServer server(80);
 
-
 // Variable to store incoiming http request
 String request;
 
-
 // Name of the device (can be used as DNS query in browser)
 #define DEVICE_NAME "HWPRobo"
-
 
 // Pins of motor
 #define MOTOR_A1_PIN D1
@@ -26,7 +23,6 @@ String request;
 #define MOTOR_B1_PIN D5
 #define MOTOR_B2_PIN D6
 const uint8_t motorPins[] = {MOTOR_A1_PIN, MOTOR_A2_PIN, MOTOR_B1_PIN, MOTOR_B2_PIN};
-
 
 // Us pins
 #define US1_PIN D8
@@ -38,10 +34,24 @@ bool teslaMode = false;
 int step = 0;
 bool run = true;
 
+// distances of US
+float d1 = 0;
+float d2 = 0;
+float d3 = 0;
+
+// connecting to arduino
+#include <SoftwareSerial.h>
+SoftwareSerial arduinoSerial(D4, D3); // TX=D4, RX=D3 (unused)
+
+// In setup() after Serial.begin()
+
+
+
 
 void setup() {
   // Init serial
-  Serial.begin(115200);
+  //Serial.begin(115200);
+  arduinoSerial.begin(9600); // Match baud rate with Arduino
 
   // Init motor pins as output
   for (size_t i = 0; i < sizeof(motorPins)/sizeof(motorPins[0]); i++) {
@@ -63,8 +73,6 @@ void setup() {
   Serial.println("WiFi connected.");
   Serial.println("IP Adress: ");
   Serial.println(WiFi.localIP());
-
-  // Uncomment if you want that the ESP creates an AP
   
   // You can remove the password parameter if you want the AP to be open.
   /*
@@ -93,26 +101,28 @@ void loop() {
   // Update MDNS
   MDNS.update();
 
-  float d2 = measureDistance(US2_PIN);  // Center sensor
+  //d1 = readUS(US1_PIN);  // Left sensor
+  d2 = readUS(US2_PIN);  // Center sensor
+  //d3 = readUS(US3_PIN);  // Right sensor
 
   Serial.print("Center distance (d2): ");
   Serial.print(d2);
   Serial.println(" cm");
 
-
-if (teslaMode) {
-    float d1 = measureDistance(US1_PIN);  // Left sensor
-    float d2 = measureDistance(US2_PIN);  // Center sensor
-    float d3 = measureDistance(US3_PIN);  // Right sensor
-
-    doTask(d2);
-
+  // Runs when Teslamode is activated thgough webite 
+  if (teslaMode) {
+    // drive straight
     drive(true, 100, 150); // Drive forward for 100ms at speed 150
 
-}
+    // drive parkout  
+    doTask(d2);
+    }
+
+
 }
 
 
+// Function for robot to follow given tasks, text distance and turn if needed. 
 void doTask(float d2) {
   // if finished quit
   if (!run) {
@@ -123,29 +133,34 @@ void doTask(float d2) {
     case 0:
       // Step 1: Drive straight until distance is 60cm --> then turn right
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold (60 * 89.4 ≈ 535)
+        arduinoSerial.write('S');
         turn(true, 480, 150); // Turn right for 500ms at speed 150
         step = 1; // Move to next step
       }
       break;
     case 1:
-      // Step 2: Drive straight until distance is 60cm --> then turn Leftf
-      if (d2 > 0 && d2 <= 60) { // ~60cm threshold
-        turn(false, 480, 150); // Turn left for 500ms at speed 150
+      // Step 2: Drive straight until distance is 60cm --> then turn Left
+      if (d2 > 0 && d2 <= 60) { 
+        arduinoSerial.write('S');
+        turn(false, 500, 150); // Turn left for 500ms at speed 150
         step = 2;
       }
       break;
     case 2:
       // Step 3: Drive straight until distance is 60cm --> then turn Left
-      if (d2 > 0 && d2 <= 60) { // ~60cm threshold
-        turn(false, 480, 150); // Turn left for 500ms at speed 150
+      if (d2 > 0 && d2 <= 60) { 
+        arduinoSerial.write('S');
+        turn(false, 500, 150); // Turn left for 500ms at speed 150
         step = 3;
       }
       break;
     case 3:
+      // drive until distance is 60cm and stop.
       if (d2 > 0 && d2 <= 60) { // ~60cm threshold
+        arduinoSerial.write('S');
         // Final turn left
-        turn(false, 480, 0); // Turn left for 500ms at speed 150
-        run = false; // Mark sequence as complete
+        turn(false, 500, 0);
+        run = false; // parkour complete
         step = 0;
         teslaMode = false;
       }
@@ -172,9 +187,9 @@ void handleClient() {
   // Check for corresponding get message  
   if (request.indexOf("GET /pollUS") >= 0) {
     // Serial.println("Polling");
-    float us1 = measureDistance(US1_PIN);
-    float us2 = measureDistance(US2_PIN);
-    float us3 = measureDistance(US3_PIN);
+    float us1 = d1;
+    float us2 = d2;
+    float us3 = d3;
 
     // Send US data to website
     client.printf("{\"US1\":%.2f, \"US2\":%.2f, \"US3\":%.2f}", us1, us2, us3);
@@ -197,34 +212,36 @@ void handleClient() {
   }
 }
 
-
-float measureDistance(int sensor)
-{
-  unsigned long int t;
-  // Start sensor
-  pinMode(sensor, OUTPUT);
-  digitalWrite(sensor, LOW);
-  delay(2);
-  digitalWrite(sensor, HIGH);
-  delay(2);  
-  digitalWrite(sensor, LOW);
+float readUS(int pin) {
+  static const unsigned long TRIGGER_DELAY = 2;
+  static const unsigned long TIMEOUT_MICROSECONDS = 30000;
+  static const float DISTANCE_MULTIPLIER = 0.017241; // ca 1/58
   
-  // read sensor
-  pinMode(sensor, INPUT);
-  while(digitalRead(sensor) == LOW) {};
+  //trigger pulse
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(TRIGGER_DELAY);
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(TRIGGER_DELAY);
+  digitalWrite(pin, LOW);
   
-  t = micros();
-  while(micros() - t < 30000)
-  {
-    if(digitalRead(sensor) == LOW)
-    {
-      return (micros() - t) / 58.;
+  pinMode(pin, INPUT);
+  
+  // Wait for echo signal start
+  while (!digitalRead(pin));
+  
+  unsigned long echoStart = micros();
+  unsigned long elapsed;
+  
+  // calc distance 
+  while ((elapsed = micros() - echoStart) < TIMEOUT_MICROSECONDS) {
+    if (!digitalRead(pin)) {
+      return elapsed * DISTANCE_MULTIPLIER;
     }
   }
   
-  return -1;
+  return -1.0; //error
 }
-
 
 void drive(bool left, uint16_t time, uint16_t speed) {
   left = !left;
