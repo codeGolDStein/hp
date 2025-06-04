@@ -6,7 +6,7 @@ Sounds: ist ein Code, den wir aus Blatt 4 übernommen haben. Wir haben ihn ansch
 
 Unsere Lösung für den Abschlusswettbewerb des Hardware-Praktikums basiert auf einem ESP8266-gesteuerten Roboter, der über eine Web-Oberfläche gesteuert wird. Der Start des Parkours erfolgt nicht über einen physischen Button, sondern durch Aktivierung des sogenannten „Tesla-Modus“ über die Website. Sobald dieser Modus aktiviert ist, durchfährt der Roboter den festgelegten Parkour selbstständig.
 
-Zur Hinderniserkennung verwenden wir drei Ultraschallsensoren (US1, US2, US3), wobei hauptsächlich der mittlere Sensor (US2) zur Abstandsmessung genutzt wird. Erkennt der Roboter eine Wand in 60 cm Entfernung, stoppt er, führt eine Drehung durch und fährt weiter. Die Drehungen (rechts, links, links) sind zeitgesteuert umgesetzt – wir haben bewusst keinen Drehratensensor verwendet, sondern die Dauer der Motoraktivierung so gewählt, dass sie einer 90°-Drehung entspricht.
+Zur Hinderniserkennung verwenden wir drei Ultraschallsensoren (US1, US2, US3), wobei der mittlere Sensor (US2) zur Abstandsmessung genutzt wird. Erkennt der Roboter eine Wand in 60 cm Entfernung, stoppt er, führt eine Drehung durch und fährt weiter. Die Drehungen (rechts, links, links) sind zeitgesteuert umgesetzt – wir haben bewusst keinen Drehratensensor verwendet, sondern die Dauer der Motoraktivierung so gewählt, dass sie einer 90°-Drehung entspricht.
 
 Zur Tonwiedergabe kommuniziert der ESP8266 per serieller Schnittstelle mit einem Arduino, der bei bestimmten Ereignissen eine Melodie im RTTTL-Format abspielt. Die gesamte Steuerlogik, Webserver und Sensorverarbeitung läuft vollständig auf dem ESP8266.
 
@@ -23,7 +23,7 @@ Zur Tonwiedergabe kommuniziert der ESP8266 per serieller Schnittstelle mit einem
 
     Serielle Verbindung zum Arduino (ESP8266):
         B-TX → A-RX
-	B-RX → A-TX
+	    B-RX → A-TX
 
     Soundausgabe (Arduino):
         Sounds Buchse (OC1B / PWM-Ausgabe) → Pin 10 (PB2)

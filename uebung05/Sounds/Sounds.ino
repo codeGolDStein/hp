@@ -1,13 +1,19 @@
+/*
+This code is functionally the same as in our Uebung, with added code to check serial.
+*/
+
+
+
+
 #define OUTPUT_PIN PB4 // Arduino Pin 12 = PB4
 #define NOTE_C6 1046
-// Aufgabe 3
+
 #define SOUND_PIN PB2 // Pin 10 = OC1B (for sound output)
 
-/*Aufgabe 5*/
 // Neue globale Variable für den Timer-Zähler
 volatile uint32_t tCount = 0;
 
-/* Aufgabe 5*/
+
 // Letzte Zeit für die Sekunden-Ausgabe
 uint32_t lastPrintTime = 0;
 // Letzte Zeit für Frequenzwechsel
@@ -18,7 +24,7 @@ uint8_t currentFreqIndex = 0;
 uint16_t frequencies[] = {1046, 880, 659, 523, 440, 659, 880, 1046};
 uint8_t numFrequencies = 8;
 
-// Aufgabe 6 & 7 – Melodie-Daten
+
 // Erhöhte Array-Größe für RTTTL-Klingeltöne
 #define MAX_NOTES 100
 uint16_t notes[MAX_NOTES] = { 262, 294, 330, 349, 392, 440, 494, 523, 587, 659 }; 
@@ -52,19 +58,19 @@ void setup() {
   // Setze Pin 13 als Ausgang (Data Direction Register B, Bit 5)
   DDRB |= (1 << PB5);
   
-  /*Aufgabe 5*/
   // Initialisiere die serielle Schnittstelle mit 38400 Baud
   Serial.begin(9600);
 
   parseRTTTL(buffer);
 
-  
   // Melody abspielen
-  //playMelody();
+  playMelody();
 }
 
 void loop() {
-  
+
+
+  // function added to play when wall is seen by sensor, --> when something is is Serial
   if (Serial.available() > 0) {
     char cmd = Serial.read();
     if (cmd == 'S') {
