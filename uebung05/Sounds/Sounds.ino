@@ -27,7 +27,7 @@ volatile uint8_t melodyIdx = 0;
 uint8_t melodyLen = 10; // Standardwert, wird beim Parsen aktualisiert
 
 // Aufgabe 7 - RTTTL Klingelton
-char buffer[] = "Bgirl:d=4,o=5,b=125:8g#,8e,8g#,8c#6,a,p,8f#,8d#,8f#,8b,g#,8f#,8e,p,8e,8c#,f#,c#,p,8f#,8e,g#,f#";
+char buffer[] = "Short:d=4,o=5,b=125:8g#,8e,8g#,8c#6";
 
 
 // Basis-Frequenzen für die 4. Oktave
