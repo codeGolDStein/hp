@@ -2,7 +2,6 @@
   #include <ESP8266WiFi.h>
   #include <ESP8266mDNS.h>
   #include "website.h"
-  #include <SoftwareSerial.h>
 
   // Add your wifi credentials here
   const char* ssid     = "Kaden";
@@ -41,8 +40,7 @@
   float d3 = 0;
 
   // connecting to arduino
-  //#include <SoftwareSerial.h>
-  SoftwareSerial arduinoSerial(D4, D3); // TX=D4, RX=D3 (unused)
+
 
   // In setup() after Serial.begin()
   void setup() {
