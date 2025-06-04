@@ -64,7 +64,9 @@ void setup() {
 }
 
 void loop() {
-  
+
+
+  // function added to play when wall is seen by sensor, --> when something is is Serial
   if (Serial.available() > 0) {
     char cmd = Serial.read();
     if (cmd == 'S') {
