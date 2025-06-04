@@ -4,8 +4,8 @@
   #include "website.h"
 
   // Add your wifi credentials here
-  const char* ssid     = "Kaden";
-  const char* password = "neinomar";
+  const char* ssid     = "Omar";
+  const char* password = "omarpassword";
 
 
   // Webserver on port 80 (standard http port)
